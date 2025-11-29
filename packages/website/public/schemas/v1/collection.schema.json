@@ -1,0 +1,52 @@
+{
+  "description": "A collection of libragen libraries that can be installed together",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Collection name",
+      "type": "string"
+    },
+    "description": {
+      "description": "Collection description",
+      "type": "string"
+    },
+    "version": {
+      "description": "Collection version",
+      "type": "string"
+    },
+    "items": {
+      "description": "Items in this collection (libraries and/or nested collections)",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CollectionItem"
+      }
+    }
+  },
+  "required": [
+    "items",
+    "name"
+  ],
+  "definitions": {
+    "CollectionItem": {
+      "description": "A collection item can be either a library or a nested collection.",
+      "type": "object",
+      "properties": {
+        "library": {
+          "description": "Library source (URL, path, or git repo) - mutually exclusive with collection",
+          "type": "string"
+        },
+        "collection": {
+          "description": "Nested collection source (URL or path) - mutually exclusive with library",
+          "type": "string"
+        },
+        "required": {
+          "description": "Whether this item is required (default: true)",
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://libragen.dev/schemas/v1/collection.schema.json",
+  "title": "Libragen Collection"
+}

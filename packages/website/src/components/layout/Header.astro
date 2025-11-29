@@ -1,0 +1,100 @@
+---
+import ThemeToggle from './ThemeToggle';
+import { Github, Menu, X } from 'lucide-react';
+
+const navLinks = [
+   { label: 'Docs', href: '/docs' },
+];
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-950/80" role="banner">
+   <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2.5 text-xl font-bold text-gray-900 dark:text-white" aria-label="Libragen home">
+         <svg class="h-8 w-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Bold L shape with stacked layers -->
+            <rect x="4" y="4" width="8" height="24" rx="2" fill="#6366F1" />
+            <rect x="4" y="20" width="24" height="8" rx="2" fill="#6366F1" />
+            <!-- Layered pages emerging -->
+            <rect x="14" y="8" width="14" height="3" rx="1" fill="#6366F1" opacity="0.3" />
+            <rect x="14" y="13" width="14" height="3" rx="1" fill="#6366F1" opacity="0.5" />
+         </svg>
+         <span class="tracking-tight">libragen</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden items-center gap-8 md:flex">
+         {navLinks.map((link) => (
+            <a
+               href={link.href}
+               class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            >
+               {link.label}
+            </a>
+         ))}
+         <a
+            href="https://github.com/libragen/libragen"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            aria-label="GitHub"
+         >
+            <Github className="h-5 w-5" />
+         </a>
+         <ThemeToggle client:load />
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button
+         id="mobile-menu-button"
+         class="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 md:hidden"
+         aria-label="Toggle menu"
+      >
+         <Menu className="h-6 w-6" id="menu-icon" />
+         <X className="hidden h-6 w-6" id="close-icon" />
+      </button>
+   </nav>
+
+   <!-- Mobile Navigation -->
+   <div id="mobile-menu" class="hidden border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950 md:hidden">
+      <div class="space-y-1 px-4 py-4">
+         {navLinks.map((link) => (
+            <a
+               href={link.href}
+               class="block rounded-lg px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            >
+               {link.label}
+            </a>
+         ))}
+         <a
+            href="https://github.com/libragen/libragen"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+         >
+            <Github className="h-5 w-5" />
+            GitHub
+         </a>
+         <div class="px-3 py-2">
+            <ThemeToggle client:load />
+         </div>
+      </div>
+   </div>
+</header>
+
+<!-- Spacer for fixed header -->
+<div class="h-[73px]"></div>
+
+<script>
+   const menuButton = document.getElementById('mobile-menu-button');
+   const mobileMenu = document.getElementById('mobile-menu');
+   const menuIcon = document.getElementById('menu-icon');
+   const closeIcon = document.getElementById('close-icon');
+
+   menuButton?.addEventListener('click', () => {
+      const isOpen = !mobileMenu?.classList.contains('hidden');
+      mobileMenu?.classList.toggle('hidden');
+      menuIcon?.classList.toggle('hidden');
+      closeIcon?.classList.toggle('hidden');
+   });
+</script>

@@ -1,0 +1,168 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "contentVersion": {
+      "type": "string"
+    },
+    "contentVersionType": {
+      "enum": [
+        "commit",
+        "custom",
+        "date",
+        "revision",
+        "semver"
+      ],
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "description": {
+      "description": "Short description of what this library contains",
+      "type": "string"
+    },
+    "agentDescription": {
+      "description": "Detailed guidance for AI agents on when to use this library.\nShould describe the types of questions/tasks this library can help with.\nExample: \"Use this library when the user asks about React hooks, component\nlifecycle, or JSX syntax. Contains official React documentation and examples.\"",
+      "type": "string"
+    },
+    "exampleQueries": {
+      "description": "Example queries that this library is good at answering.\nHelps agents understand the library's scope through concrete examples.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "keywords": {
+      "description": "Searchable keywords/tags",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "programmingLanguages": {
+      "description": "Primary programming language(s) covered (e.g., \"typescript\", \"python\")",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "textLanguages": {
+      "description": "Human/natural language(s) of the content, as ISO 639-1 codes (e.g., \"en\", \"es\", \"zh\")",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "frameworks": {
+      "description": "Frameworks or tools covered (e.g., \"react\", \"express\", \"pytest\")",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "type": "string"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "repository": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "embedding": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "number"
+        },
+        "quantization": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimensions",
+        "model"
+      ]
+    },
+    "chunking": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "chunkSize": {
+          "type": "number"
+        },
+        "chunkOverlap": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "chunkOverlap",
+        "chunkSize",
+        "strategy"
+      ]
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "chunkCount": {
+          "type": "number"
+        },
+        "sourceCount": {
+          "type": "number"
+        },
+        "fileSize": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "chunkCount",
+        "fileSize",
+        "sourceCount"
+      ]
+    },
+    "contentHash": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "chunking",
+    "contentHash",
+    "createdAt",
+    "embedding",
+    "name",
+    "stats",
+    "version"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://libragen.dev/schemas/v1/library-metadata.schema.json",
+  "title": "Libragen Library Metadata",
+  "description": "Metadata stored inside .libragen files describing the library contents"
+}

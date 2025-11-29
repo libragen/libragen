@@ -1,0 +1,138 @@
+---
+title: Getting Started
+description: Build your first RAG library in under 60 seconds
+section: Getting Started
+order: 1
+---
+
+import LibraryDownloadLink from '../../components/docs/LibraryDownloadLink.astro';
+
+Libragen (pronounced "LIB-ruh-jen") lets you create portable, searchable RAG libraries from any documentation. Libraries are single SQLite files you can share, version control, and query locally—no cloud services required.
+
+> **Try it now:** This documentation is available as a libragen library. Download <LibraryDownloadLink /> and query it locally!
+
+## Quick Start
+
+### 1. Build a Library
+
+Create a library from a directory of markdown, text, or HTML files:
+
+```bash
+libragen build ./my-docs --name my-library
+```
+
+This will:
+- Process all supported files in `./my-docs`
+- Generate embeddings using a local model
+- Build a full-text search index
+- Save everything to `my-library-1.0.0.libragen`
+
+### 2. Query Your Library
+
+Search with natural language:
+
+```bash
+libragen query --library my-library "How do I authenticate?"
+```
+
+Results include relevance scores and source file information.
+
+### 3. Use with MCP (Optional)
+
+Install the MCP server for your AI tool with one command:
+
+```bash
+npx -y install-mcp @libragen/mcp
+```
+
+This automatically configures Claude Desktop, Cursor, Windsurf, or other MCP-compatible tools. Your AI assistant can now query your libraries directly.
+
+## Installation Options
+
+### Use Without Installing
+
+The easiest way to use libragen is with `npx`:
+
+```bash
+# Build
+libragen build ./docs --name my-docs
+
+# Query
+libragen query --library my-docs "your question"
+```
+
+### Global Installation
+
+For frequent use, install globally:
+
+```bash
+npm install -g @libragen/cli
+
+# Now use without npx
+libragen build ./docs --name my-docs
+libragen query --library my-docs "your question"
+```
+
+**Enable shell completions** for tab-completion of commands and options:
+
+```bash
+libragen completions install
+```
+
+### As a Project Dependency
+
+For programmatic use in your project:
+
+```bash
+npm install --save-exact @libragen/core
+```
+
+## Library Storage
+
+Libraries are discovered from multiple locations:
+
+### Default Behavior
+
+1. **Project directory** — If `.libragen/libraries/` exists in the current directory, it's included automatically
+2. **Global directory** — Platform-specific location (see below)
+
+| Platform | Global Path |
+|----------|-------------|
+| macOS | `~/Library/Application Support/libragen/libraries/` |
+| Linux | `~/.local/share/libragen/libraries/` |
+| Windows | `%APPDATA%\libragen\libraries\` |
+
+Project-local libraries take priority over global libraries with the same name.
+
+### Project-Local Libraries
+
+To use project-specific libraries, create a `.libragen/libraries/` directory in your project:
+
+```bash
+mkdir -p .libragen/libraries
+libragen install ./my-lib.libragen -p .libragen/libraries
+```
+
+This is useful for:
+- Project-specific documentation
+- Version-controlled library sets
+- CI/CD environments
+
+### Environment Variables
+
+Override the global directory with `LIBRAGEN_HOME`:
+
+```bash
+export LIBRAGEN_HOME=/custom/path
+```
+
+Run `libragen config` to see current paths and active environment variables.
+
+## Next Steps
+
+- [CLI Reference](/docs/cli) - Full command documentation
+- [Building Libraries](/docs/building) - Advanced build options
+- [CI Integration](/docs/ci-integration) - Automate builds in your pipeline
+- [MCP Integration](/docs/mcp) - Connect to AI tools
+- [Collections](/docs/collections) - Install curated library bundles
+- [Troubleshooting](/docs/troubleshooting) - Solutions to common issues

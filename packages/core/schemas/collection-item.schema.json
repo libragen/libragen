@@ -1,0 +1,21 @@
+{
+  "description": "An item in a libragen collection (library or nested collection)",
+  "type": "object",
+  "properties": {
+    "library": {
+      "description": "Library source (URL, path, or git repo) - mutually exclusive with collection",
+      "type": "string"
+    },
+    "collection": {
+      "description": "Nested collection source (URL or path) - mutually exclusive with library",
+      "type": "string"
+    },
+    "required": {
+      "description": "Whether this item is required (default: true)",
+      "type": "boolean"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://libragen.dev/schemas/collection-item.json",
+  "title": "Libragen Collection Item"
+}

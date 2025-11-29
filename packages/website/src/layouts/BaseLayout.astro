@@ -1,0 +1,147 @@
+---
+import { Schema } from 'astro-seo-schema';
+import { Seo } from 'astro-seo-meta';
+
+interface Props {
+   title: string;
+   description?: string;
+   image?: string;
+   type?: 'website' | 'article';
+   keywords?: string[];
+}
+
+const {
+   title,
+   description = 'Portable RAG libraries for AI agents. Create, share, and query self-contained vector libraries.',
+   image = '/og-image.svg',
+   type = 'website',
+   keywords = ['RAG', 'vector search', 'AI agents', 'MCP', 'documentation', 'embeddings', 'LLM', 'Claude', 'semantic search'],
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+      <!-- SEO Meta Tags -->
+      <Seo
+         title={title}
+         description={description}
+         keywords={keywords}
+         icon="/favicon.svg"
+         themeColor="#818cf8"
+         colorScheme="dark"
+         facebook={{
+            image: imageURL.toString(),
+            url: canonicalURL.toString(),
+            type: type,
+         }}
+         twitter={{
+            image: imageURL.toString(),
+            card: 'summary_large_image',
+         }}
+      />
+
+      <!-- Support both dark and light schemes -->
+      <meta name="color-scheme" content="dark light" />
+
+      <!-- Additional meta tags not covered by astro-seo-meta -->
+      <meta name="author" content="Libragen" />
+
+      <!-- Favicon & Icons -->
+      <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+      <link rel="manifest" href="/manifest.json" />
+
+      <!-- Canonical & Generator -->
+      <link rel="canonical" href={canonicalURL} />
+      <meta name="generator" content={Astro.generator} />
+
+      <!-- Fonts - preconnect and preload for performance -->
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         rel="preload"
+         as="style"
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+         rel="stylesheet"
+         media="print"
+         onload="this.media='all'"
+      />
+      <noscript>
+         <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+         />
+      </noscript>
+
+      <!-- Extended OpenGraph (not covered by astro-seo-meta) -->
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="Libragen - Portable RAG Libraries for AI Agents" />
+      <meta property="og:site_name" content="Libragen" />
+      <meta property="og:locale" content="en_US" />
+
+      <!-- Extended Twitter (not covered by astro-seo-meta) -->
+      <meta name="twitter:image:alt" content="Libragen - Portable RAG Libraries for AI Agents" />
+
+      <!-- JSON-LD Structured Data -->
+      <Schema
+         item={{
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'Libragen',
+            description: 'Portable RAG libraries for AI agents. Create, share, and query self-contained vector libraries with hybrid search.',
+            url: Astro.site?.toString(),
+            applicationCategory: 'DeveloperApplication',
+            operatingSystem: 'Cross-platform',
+            offers: {
+               '@type': 'Offer',
+               price: '0',
+               priceCurrency: 'USD',
+            },
+            author: {
+               '@type': 'Organization',
+               name: 'Libragen',
+               url: Astro.site?.toString(),
+            },
+            keywords: keywords.join(', '),
+         }}
+      />
+
+      <!-- Additional page-specific structured data -->
+      <slot name="head" />
+
+      <title>{title}</title>
+   </head>
+   <body class="min-h-screen">
+      <!-- Skip to content link for accessibility -->
+      <a
+         href="#main-content"
+         class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-indigo-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+      >
+         Skip to main content
+      </a>
+      <slot />
+   </body>
+</html>
+
+<script is:inline>
+   // Check for dark mode preference
+   if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      document.documentElement.classList.remove('dark');
+   } else {
+      document.documentElement.classList.add('dark');
+   }
+</script>
+
+<style is:global>
+   @import '../styles/global.css';
+</style>

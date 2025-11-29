@@ -1,0 +1,266 @@
+---
+import { getCollection } from 'astro:content';
+import { Schema } from 'astro-seo-schema';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import DocSearch from '../components/docs/DocSearch';
+
+interface Props {
+   title: string;
+   description?: string;
+}
+
+const { title, description } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Get all docs and organize by section
+const allDocs = await getCollection('docs');
+const sortedDocs = allDocs.sort((a, b) => a.data.order - b.data.order);
+
+// Group docs by section
+const sections: Record<string, typeof sortedDocs> = {};
+for (const doc of sortedDocs) {
+   const section = doc.data.section || 'General';
+   if (!sections[section]) {
+      sections[section] = [];
+   }
+   sections[section].push(doc);
+}
+
+// Define section order
+const sectionOrder = ['Getting Started', 'Guides', 'Reference', 'Tutorials', 'General'];
+const orderedSections = sectionOrder.filter((s) => sections[s]).concat(
+   Object.keys(sections).filter((s) => !sectionOrder.includes(s)),
+);
+
+// Prepare search data (strip markdown for content)
+const searchDocs = allDocs.map((doc) => ({
+   slug: doc.id.replace(/\.mdx?$/, ''),
+   title: doc.data.title,
+   description: doc.data.description || '',
+   section: doc.data.section || 'General',
+   content: doc.body || '',
+}));
+
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout
+   title={`${title} - Libragen Docs`}
+   description={description || `Learn about ${title} in the Libragen documentation.`}
+   type="article"
+   keywords={['libragen', 'documentation', 'RAG', 'vector search', title.toLowerCase()]}
+>
+   <Fragment slot="head">
+      <Schema
+         item={{
+            '@context': 'https://schema.org',
+            '@type': 'TechArticle',
+            headline: title,
+            description: description || `Learn about ${title} in the Libragen documentation.`,
+            url: canonicalURL.toString(),
+            author: {
+               '@type': 'Organization',
+               name: 'Libragen',
+               url: Astro.site?.toString(),
+            },
+            publisher: {
+               '@type': 'Organization',
+               name: 'Libragen',
+               url: Astro.site?.toString(),
+               logo: {
+                  '@type': 'ImageObject',
+                  url: `${Astro.site}favicon.svg`,
+               },
+            },
+            mainEntityOfPage: {
+               '@type': 'WebPage',
+               '@id': canonicalURL.toString(),
+            },
+            isPartOf: {
+               '@type': 'WebSite',
+               name: 'Libragen Documentation',
+               url: `${Astro.site}docs/`,
+            },
+         }}
+      />
+      <Schema
+         item={{
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+               {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: 'Home',
+                  item: Astro.site?.toString(),
+               },
+               {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: 'Documentation',
+                  item: `${Astro.site}docs/`,
+               },
+               {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: title,
+                  item: canonicalURL.toString(),
+               },
+            ],
+         }}
+      />
+   </Fragment>
+   <Header />
+   <div class="mx-auto flex min-h-screen max-w-7xl">
+      <!-- Sidebar -->
+      <aside class="hidden w-64 shrink-0 border-r border-gray-200 dark:border-gray-800 lg:block">
+         <nav class="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+            <!-- Search -->
+            <div class="mb-6">
+               <DocSearch docs={searchDocs} client:load />
+            </div>
+
+            {orderedSections.map((sectionName) => (
+               <div class="mb-6">
+                  <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                     {sectionName}
+                  </h3>
+                  <ul class="space-y-1">
+                     {sections[sectionName].map((doc) => {
+                        const href = `/docs/${doc.id.replace(/\.mdx?$/, '')}`;
+                        const isActive = currentPath === href || currentPath === `${href}/`;
+                        return (
+                           <li>
+                              <a
+                                 href={href}
+                                 class:list={[
+                                    'block rounded-md px-3 py-2 text-sm transition-colors',
+                                    isActive
+                                       ? 'bg-indigo-50 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800',
+                                 ]}
+                              >
+                                 {doc.data.title}
+                              </a>
+                           </li>
+                        );
+                     })}
+                  </ul>
+               </div>
+            ))}
+         </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main id="main-content" class="min-w-0 flex-1 px-6 py-12 lg:px-16">
+         <article class="prose prose-lg prose-gray max-w-3xl dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:scroll-mt-20 prose-h1:text-4xl prose-h1:font-bold prose-h2:text-2xl prose-h2:mt-12 prose-h2:border-b prose-h2:border-gray-200 prose-h2:pb-2 dark:prose-h2:border-gray-800 prose-h3:text-xl prose-h3:mt-8 prose-p:leading-relaxed prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline dark:prose-a:text-indigo-400 prose-code:text-[0.9em] prose-pre:text-sm">
+            <header class="mb-10 border-b border-gray-200 pb-8 dark:border-gray-800">
+               <h1 class="!mb-3">{title}</h1>
+               {description && <p class="!mt-0 text-xl leading-relaxed text-gray-600 dark:text-gray-400">{description}</p>}
+            </header>
+            <slot />
+         </article>
+      </main>
+   </div>
+   <Footer />
+</BaseLayout>
+
+<style>
+   .prose :global(pre) {
+      @apply relative rounded-lg border border-gray-200 bg-gray-900 dark:border-gray-700;
+   }
+
+   .prose :global(pre .copy-button) {
+      @apply absolute right-2 top-2 rounded p-1.5 text-gray-400 opacity-0 transition-opacity hover:bg-gray-700 hover:text-white;
+   }
+
+   .prose :global(pre:hover .copy-button) {
+      @apply opacity-100;
+   }
+
+   .prose :global(pre .copy-button.copied) {
+      @apply text-green-400;
+   }
+
+   .prose :global(code:not(pre code)) {
+      @apply rounded bg-gray-100 px-1.5 py-0.5 font-medium dark:bg-gray-800;
+   }
+
+   .prose :global(code:not(pre code))::before,
+   .prose :global(code:not(pre code))::after {
+      content: none;
+   }
+
+   /* Blockquotes */
+   .prose :global(blockquote) {
+      @apply border-l-4 border-indigo-500 bg-indigo-50/50 py-1 pl-4 pr-4 not-italic dark:bg-indigo-950/30;
+   }
+
+   .prose :global(blockquote p) {
+      @apply text-gray-700 dark:text-gray-300;
+   }
+
+   .prose :global(blockquote p::before),
+   .prose :global(blockquote p::after) {
+      content: none;
+   }
+
+   /* Tables */
+   .prose :global(table) {
+      @apply text-base;
+   }
+
+   .prose :global(th) {
+      @apply bg-gray-50 font-semibold dark:bg-gray-800/50;
+   }
+
+   .prose :global(td),
+   .prose :global(th) {
+      @apply border-gray-200 px-4 py-3 dark:border-gray-700;
+   }
+
+   /* Lists */
+   .prose :global(ul > li::marker) {
+      @apply text-indigo-500;
+   }
+
+   .prose :global(ol > li::marker) {
+      @apply font-semibold text-indigo-600 dark:text-indigo-400;
+   }
+
+   /* Strong text */
+   .prose :global(strong) {
+      @apply font-semibold text-gray-900 dark:text-white;
+   }
+
+</style>
+
+<script>
+   // Add copy buttons to all code blocks
+   document.querySelectorAll('.prose pre').forEach((pre) => {
+      const code = pre.querySelector('code');
+      if (!code) return;
+
+      const button = document.createElement('button');
+      button.className = 'copy-button';
+      button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+      button.setAttribute('aria-label', 'Copy code');
+
+      button.addEventListener('click', async () => {
+         const text = code.textContent || '';
+         await navigator.clipboard.writeText(text);
+
+         button.classList.add('copied');
+         button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+         setTimeout(() => {
+            button.classList.remove('copied');
+            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+         }, 2000);
+      });
+
+      pre.appendChild(button);
+   });
+</script>

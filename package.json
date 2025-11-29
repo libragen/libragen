@@ -1,0 +1,55 @@
+{
+   "name": "libragen",
+   "version": "0.1.0",
+   "private": true,
+   "description": "Cross-platform tools for creating, managing, and querying modular RAG-ready libraries",
+   "workspaces": [
+      "packages/*"
+   ],
+   "scripts": {
+      "build": "tsc --build && npm run website:build && npm run collections:build",
+      "build:clean": "tsc --build --clean",
+      "test": "vitest run",
+      "eslint": "ESLINT_USE_FLAT_CONFIG=false eslint .",
+      "markdownlint": "markdownlint-cli2",
+      "commitlint": "commitlint --from $(git rev-list --max-parents=0 HEAD) --to HEAD",
+      "standards": "npm run eslint && npm run markdownlint",
+      "generate:schema": "npx tsx scripts/generate-schema.ts",
+      "changeset": "changeset",
+      "version": "changeset version",
+      "release": "changeset publish",
+      "website:dev": "npm run dev --workspace=@libragen/website",
+      "website:build": "npm run build --workspace=@libragen/website",
+      "website:preview": "npm run preview --workspace=@libragen/website",
+      "collections:dev": "npm run dev --workspace=@libragen/collections-site",
+      "collections:build": "npm run build --workspace=@libragen/collections-site",
+      "collections:preview": "npm run preview --workspace=@libragen/collections-site"
+   },
+   "keywords": [
+      "rag",
+      "vector",
+      "embeddings",
+      "search",
+      "mcp"
+   ],
+   "author": "",
+   "license": "MIT",
+   "type": "module",
+   "engines": {
+      "node": ">=24.0.0"
+   },
+   "devDependencies": {
+      "@changesets/changelog-github": "0.5.2",
+      "@changesets/cli": "2.29.8",
+      "@commitlint/cli": "^20.1.0",
+      "@silvermine/eslint-config": "^3.2.1",
+      "@silvermine/standardization": "^2.2.3",
+      "@types/node": "^24.10.1",
+      "eslint": "^8.57.1",
+      "markdownlint-cli2": "^0.19.1",
+      "tsx": "4.21.0",
+      "typescript": "^5.9.3",
+      "typescript-json-schema": "0.67.0",
+      "vitest": "^4.0.14"
+   }
+}

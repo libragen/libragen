@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+html {
+   scroll-behavior: smooth;
+}
+
+body {
+   @apply bg-white font-sans text-gray-900 antialiased;
+}
+
+/* Dark mode */
+html.dark body {
+   @apply bg-gray-950 text-gray-100;
+}
+
+/* Code blocks */
+pre,
+code {
+   @apply font-mono;
+}
+
+/* Selection */
+::selection {
+   @apply bg-indigo-500/30;
+}
+
+/* Focus styles */
+:focus-visible {
+   @apply outline-2 outline-offset-2 outline-indigo-500;
+}

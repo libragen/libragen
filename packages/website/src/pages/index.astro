@@ -1,0 +1,58 @@
+---
+import { Schema } from 'astro-seo-schema';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import Hero from '../components/marketing/Hero.astro';
+import Problems from '../components/marketing/Problems.astro';
+import Solution from '../components/marketing/Solution.astro';
+import Features from '../components/marketing/Features.astro';
+import UseCases from '../components/marketing/UseCases.astro';
+import QuickStart from '../components/marketing/QuickStart.astro';
+import CIIntegration from '../components/marketing/CIIntegration.astro';
+import SocialProof from '../components/marketing/SocialProof.astro';
+---
+
+<BaseLayout title="Libragen - Stop AI Hallucinations with RAG Libraries">
+   <Fragment slot="head">
+      <Schema
+         item={{
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Libragen',
+            url: Astro.site?.toString(),
+            description: 'Portable RAG libraries for AI agents. Create, share, and query self-contained vector libraries.',
+            potentialAction: {
+               '@type': 'SearchAction',
+               target: {
+                  '@type': 'EntryPoint',
+                  urlTemplate: `${Astro.site}docs?q={search_term_string}`,
+               },
+               'query-input': 'required name=search_term_string',
+            },
+         }}
+      />
+      <Schema
+         item={{
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Libragen',
+            url: Astro.site?.toString(),
+            logo: `${Astro.site}favicon.svg`,
+            sameAs: ['https://github.com/libragen/libragen'],
+         }}
+      />
+   </Fragment>
+   <Header />
+   <main id="main-content">
+      <Hero />
+      <Problems />
+      <Solution />
+      <Features />
+      <UseCases />
+      <QuickStart />
+      <CIIntegration />
+      <SocialProof />
+   </main>
+   <Footer />
+</BaseLayout>

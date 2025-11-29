@@ -1,0 +1,82 @@
+---
+interface Props {
+   title: string;
+   description?: string;
+}
+
+const {
+   title,
+   description = 'Browse and install curated libragen collections for AI-powered documentation search.',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="description" content={description} />
+      <meta name="theme-color" content="#818cf8" />
+      <meta name="color-scheme" content="dark light" />
+
+      <!-- Favicon & Icons -->
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+      <!-- Canonical & Generator -->
+      <link rel="canonical" href={canonicalURL} />
+      <meta name="generator" content={Astro.generator} />
+
+      <!-- Fonts -->
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         rel="preload"
+         as="style"
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+         rel="stylesheet"
+         media="print"
+         onload="this.media='all'"
+      />
+      <noscript>
+         <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+         />
+      </noscript>
+
+      <!-- OpenGraph -->
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={canonicalURL} />
+      <meta property="og:site_name" content="Libragen Collections" />
+
+      <title>{title}</title>
+   </head>
+   <body class="min-h-screen">
+      <a
+         href="#main-content"
+         class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-indigo-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+      >
+         Skip to main content
+      </a>
+      <slot />
+   </body>
+</html>
+
+<script is:inline>
+   if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      document.documentElement.classList.remove('dark');
+   } else {
+      document.documentElement.classList.add('dark');
+   }
+</script>
+
+<style is:global>
+   @import '../styles/global.css';
+</style>

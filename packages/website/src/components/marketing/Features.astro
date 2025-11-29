@@ -1,0 +1,67 @@
+---
+import { Package, Search, Zap, Plug, FolderSync, Terminal } from 'lucide-react';
+
+const features = [
+   {
+      icon: Search,
+      title: 'Hybrid Search',
+      description: 'Vector similarity + BM25 keyword search with reciprocal rank fusion. Find the most relevant docs, not just keyword matches.',
+   },
+   {
+      icon: Plug,
+      title: 'MCP Native',
+      description: 'First-class Model Context Protocol support. Works with Claude, Cursor, VS Code, Windsurf, and any MCP-compatible client.',
+   },
+   {
+      icon: Package,
+      title: 'Truly Portable',
+      description: 'One .libragen file = complete library. Email it, Slack it, commit it, host it. Works offline, no accounts needed.',
+   },
+   {
+      icon: Zap,
+      title: 'Private & Offline',
+      description: 'Runs entirely on your machine. No API keys, no cloud accounts, no third-party services. Your proprietary docs stay private.',
+   },
+   {
+      icon: FolderSync,
+      title: 'Collections',
+      description: 'Curated library bundles for popular frameworks. Install React, Next.js, and Tailwind docs with one command.',
+   },
+   {
+      icon: Terminal,
+      title: 'CLI + TypeScript API',
+      description: 'Build and query from the command line, or integrate into your tools with the full @libragen/core API.',
+   },
+];
+---
+
+<section class="bg-white pt-6 pb-24 dark:bg-gray-950">
+   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Section header -->
+      <div class="text-center">
+         <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            Everything you need for AI-powered search
+         </h2>
+         <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+            Build and distribute RAG libraries with a complete toolkit designed for simplicity and power.
+         </p>
+      </div>
+
+      <!-- Features grid -->
+      <div class="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+         {features.map((feature) => (
+            <div class="group relative rounded-2xl border border-gray-200 bg-gray-50 p-6 transition-all hover:border-primary-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-700">
+               <div class="mb-4 inline-flex rounded-xl bg-primary-100 p-3 text-primary-600 dark:bg-primary-950 dark:text-primary-400">
+                  <feature.icon className="h-6 w-6" />
+               </div>
+               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  {feature.title}
+               </h3>
+               <p class="mt-2 text-gray-600 dark:text-gray-400">
+                  {feature.description}
+               </p>
+            </div>
+         ))}
+      </div>
+   </div>
+</section>

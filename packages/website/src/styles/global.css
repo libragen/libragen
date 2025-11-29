@@ -1,0 +1,19 @@
+@import '@libragen/ui/styles/global.css';
+
+/* Prevent horizontal overflow on mobile */
+html,
+body {
+   overflow-x: hidden;
+}
+
+/* Expressive Code blocks - ensure horizontal scroll on mobile */
+.expressive-code {
+   max-width: calc(100vw - 2rem);
+   overflow-x: auto;
+}
+
+@media (min-width: 1024px) {
+   .expressive-code {
+      max-width: 100%;
+   }
+}

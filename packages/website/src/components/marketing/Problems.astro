@@ -1,0 +1,94 @@
+---
+import { AlertTriangle, Clock, Users, Brain, FileQuestion, Repeat } from 'lucide-react';
+
+const problems = [
+   {
+      icon: Brain,
+      problem: 'AI hallucinates outdated APIs',
+      description: 'Your coding agent confidently suggests deprecated methods and non-existent functions because its training data is months or years old.',
+      stat: '62%',
+      statLabel: 'of devs use AI coding tools. Just kidding. This is an AI hallucinated statistic. See? It\'s a problem.',
+   },
+   {
+      icon: FileQuestion,
+      problem: 'Docs aren\'t AI-ready',
+      description: 'Internal documentation lives in wikis, PDFs, and scattered markdown files. None of it is in a format your AI tools can actually use.',
+      stat: '3-6mo',
+      statLabel: 'typical LLM knowledge lag',
+   },
+   {
+      icon: Users,
+      problem: 'RAG requires cloud infrastructure',
+      description: 'Traditional RAG needs vector databases, API keys, and cloud accounts. That\'s friction for individuals and a security review for teams.',
+      stat: '$$$',
+      statLabel: 'in cloud costs & complexity',
+   },
+];
+---
+
+<section class="bg-gray-50 pb-12 pt-16 dark:bg-gray-900/50">
+   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Section header -->
+      <div class="text-center">
+         <p class="text-sm font-semibold uppercase tracking-wide text-red-600 dark:text-red-400">
+            The Problem
+         </p>
+         <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            Your AI is working with outdated context
+         </h2>
+         <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+            LLMs are trained on snapshots of the past. When docs change, APIs update, or your team writes new code—your AI doesn't know.
+         </p>
+      </div>
+
+      <!-- Problem cards -->
+      <div class="mt-16 grid gap-8 md:grid-cols-3">
+         {problems.map((item) => (
+            <div class="relative rounded-2xl border border-red-200/50 bg-white p-8 dark:border-red-900/50 dark:bg-gray-800/50">
+               <!-- Icon -->
+               <div class="mb-4 inline-flex rounded-lg bg-red-100 p-3 dark:bg-red-900/30">
+                  <item.icon className="h-6 w-6 text-red-600 dark:text-red-400" />
+               </div>
+
+               <!-- Problem -->
+               <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  {item.problem}
+               </h3>
+
+               <!-- Description -->
+               <p class="mt-3 text-gray-600 dark:text-gray-400">
+                  {item.description}
+               </p>
+
+               <!-- Stat -->
+               <div class="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
+                  <p class="text-3xl font-bold text-red-600 dark:text-red-400">{item.stat}</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-500">{item.statLabel}</p>
+               </div>
+            </div>
+         ))}
+      </div>
+
+      <!-- Transition to solution -->
+      <div class="mt-16 text-center">
+         <p class="text-lg text-gray-600 dark:text-gray-400">
+            What if you could give your AI access to <span class="font-semibold text-gray-900 dark:text-white">any documentation</span>,
+            kept <span class="font-semibold text-gray-900 dark:text-white">always up to date</span>,
+            and <span class="font-semibold text-gray-900 dark:text-white">shared across your team</span>?
+         </p>
+
+         <!-- Arrow pointing to solution -->
+         <div class="mt-8 flex justify-center">
+            <svg
+               class="h-20 w-20 text-green-500 dark:text-green-400"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke="currentColor"
+               stroke-width="2"
+            >
+               <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+         </div>
+      </div>
+   </div>
+</section>

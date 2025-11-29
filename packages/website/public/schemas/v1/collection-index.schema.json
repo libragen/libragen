@@ -1,0 +1,101 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Collection name",
+      "type": "string"
+    },
+    "version": {
+      "description": "Collection index format version",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "Last updated timestamp",
+      "type": "string"
+    },
+    "libraries": {
+      "description": "Available libraries",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CollectionLibrary"
+      }
+    }
+  },
+  "required": [
+    "libraries",
+    "name",
+    "updatedAt",
+    "version"
+  ],
+  "definitions": {
+    "CollectionLibrary": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Library name",
+          "type": "string"
+        },
+        "description": {
+          "description": "Short description",
+          "type": "string"
+        },
+        "versions": {
+          "description": "Available versions",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CollectionLibraryVersion"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "versions"
+      ]
+    },
+    "CollectionLibraryVersion": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "Library version (e.g., \"1.0.0\")",
+          "type": "string"
+        },
+        "contentVersion": {
+          "description": "Content version (e.g., \"1.74.0\" for Rust docs)",
+          "type": "string"
+        },
+        "contentVersionType": {
+          "description": "Content version type",
+          "enum": [
+            "commit",
+            "custom",
+            "date",
+            "revision",
+            "semver"
+          ],
+          "type": "string"
+        },
+        "downloadURL": {
+          "description": "Download URL for the .libragen file",
+          "type": "string"
+        },
+        "contentHash": {
+          "description": "SHA-256 content hash for integrity verification",
+          "type": "string"
+        },
+        "fileSize": {
+          "description": "File size in bytes",
+          "type": "number"
+        }
+      },
+      "required": [
+        "contentHash",
+        "downloadURL",
+        "version"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://libragen.dev/schemas/v1/collection-index.schema.json",
+  "title": "Libragen Collection Index",
+  "description": "Index format served by collection servers listing available libraries"
+}

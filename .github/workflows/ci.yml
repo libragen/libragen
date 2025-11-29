@@ -1,0 +1,88 @@
+name: CI
+
+on:
+   push:
+      branches: [main]
+   pull_request:
+   merge_group:
+
+jobs:
+   standards:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+           with:
+              fetch-depth: 0
+         - uses: actions/setup-node@v4
+           with:
+              node-version: 24
+              cache: npm
+         - run: npm ci
+         - run: npm run standards
+
+   test:
+      strategy:
+         matrix:
+            os: [ubuntu-latest, macos-latest, windows-latest]
+      runs-on: ${{ matrix.os }}
+      steps:
+         - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+              node-version: 24
+              cache: npm
+         - run: npm ci
+         - run: npm test
+
+   build:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+              node-version: 24
+              cache: npm
+         - run: npm ci
+         - run: npm run build
+
+   schemas:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+              node-version: 24
+              cache: npm
+         - run: npm ci
+         - run: npm run generate:schema
+         - name: Check schemas are up to date
+           run: |
+              if [ -n "$(git status --porcelain schemas/ packages/core/schemas/)" ]; then
+                echo "Error: Generated schemas are out of date. Run 'npm run generate:schema' and commit the changes."
+                git diff schemas/ packages/core/schemas/
+                exit 1
+              fi
+
+   changeset:
+      if: github.event_name == 'pull_request'
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+           with:
+              fetch-depth: 0
+         - name: Check for changeset
+           run: |
+              # Skip check for Version Packages PRs and docs/ci-only changes
+              if [[ "${{ github.head_ref }}" == "changeset-release/"* ]]; then
+                echo "Skipping changeset check for release PR"
+                exit 0
+              fi
+
+              # Check if there are any new changeset files
+              CHANGESETS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- '.changeset/*.md' | grep -v README.md || true)
+              if [ -z "$CHANGESETS" ]; then
+                echo "::warning::No changeset found. If this PR includes user-facing changes, run 'npm run changeset' and commit the result."
+              else
+                echo "Found changeset(s):"
+                echo "$CHANGESETS"
+              fi

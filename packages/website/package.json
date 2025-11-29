@@ -1,0 +1,35 @@
+{
+  "name": "@libragen/website",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "bash scripts/build.sh",
+    "build:schemas": "cp ../../schemas/*.schema.json ./public/schemas/v1/",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@4hse/astro-llms-txt": "1.0.4",
+    "@astrojs/mdx": "4.3.12",
+    "@astrojs/react": "4.3.1",
+    "@astrojs/sitemap": "3.6.0",
+    "@astrojs/tailwind": "6.0.2",
+    "@libragen/ui": "*",
+    "@tailwindcss/typography": "0.5.19",
+    "@yeskunall/astro-umami": "0.0.7",
+    "asciinema-player": "3.9.0",
+    "astro": "5.16.3",
+    "astro-expressive-code": "0.41.3",
+    "astro-seo-meta": "5.2.0",
+    "astro-seo-schema": "5.1.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "schema-dts": "1.1.5",
+    "tailwindcss": "3.4.17"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.6",
+    "@types/react-dom": "19.1.5"
+  }
+}

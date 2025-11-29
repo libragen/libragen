@@ -1,0 +1,132 @@
+name: 'Build Libragen Library'
+description: 'Build a portable RAG library from your documentation'
+author: 'Libragen'
+branding:
+  icon: 'book'
+  color: 'purple'
+
+inputs:
+  source:
+    description: 'Source directory containing documentation files'
+    required: true
+    default: './docs'
+  name:
+    description: 'Name of the library to create'
+    required: true
+  version:
+    description: 'Library version (omit to use unversioned filename)'
+    required: false
+  description:
+    description: 'Library description'
+    required: false
+  output:
+    description: 'Output directory for the library file'
+    required: false
+    default: '.'
+  chunk-size:
+    description: 'Target chunk size in characters'
+    required: false
+  chunk-overlap:
+    description: 'Chunk overlap in characters'
+    required: false
+  extensions:
+    description: 'File extensions to process (comma-separated)'
+    required: false
+  exclude:
+    description: 'Glob patterns to exclude (comma-separated)'
+    required: false
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '24'
+  cache-model:
+    description: 'Cache the embedding model between runs'
+    required: false
+    default: 'true'
+
+outputs:
+  library-path:
+    description: 'Path to the generated library file'
+    value: ${{ steps.build.outputs.library-path }}
+  library-name:
+    description: 'Name of the generated library file'
+    value: ${{ steps.build.outputs.library-name }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Cache embedding model
+      if: inputs.cache-model == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.libragen/models
+        key: libragen-embedding-model-v1
+
+    - name: Build library
+      id: build
+      shell: bash
+      env:
+        INPUT_SOURCE: ${{ inputs.source }}
+        INPUT_NAME: ${{ inputs.name }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DESCRIPTION: ${{ inputs.description }}
+        INPUT_OUTPUT: ${{ inputs.output }}
+        INPUT_CHUNK_SIZE: ${{ inputs.chunk-size }}
+        INPUT_CHUNK_OVERLAP: ${{ inputs.chunk-overlap }}
+        INPUT_EXTENSIONS: ${{ inputs.extensions }}
+        INPUT_EXCLUDE: ${{ inputs.exclude }}
+      run: |
+        # Build the command
+        CMD="npx -y @libragen/cli build \"$INPUT_SOURCE\" --name \"$INPUT_NAME\""
+
+        if [ -n "$INPUT_VERSION" ]; then
+          CMD="$CMD --version \"$INPUT_VERSION\""
+        fi
+
+        if [ -n "$INPUT_DESCRIPTION" ]; then
+          CMD="$CMD --description \"$INPUT_DESCRIPTION\""
+        fi
+
+        if [ -n "$INPUT_OUTPUT" ]; then
+          CMD="$CMD --output \"$INPUT_OUTPUT\""
+        fi
+
+        if [ -n "$INPUT_CHUNK_SIZE" ]; then
+          CMD="$CMD --chunk-size $INPUT_CHUNK_SIZE"
+        fi
+
+        if [ -n "$INPUT_CHUNK_OVERLAP" ]; then
+          CMD="$CMD --chunk-overlap $INPUT_CHUNK_OVERLAP"
+        fi
+
+        if [ -n "$INPUT_EXTENSIONS" ]; then
+          CMD="$CMD --extensions $INPUT_EXTENSIONS"
+        fi
+
+        if [ -n "$INPUT_EXCLUDE" ]; then
+          # Split comma-separated excludes into multiple --exclude flags
+          IFS=',' read -ra EXCLUDES <<< "$INPUT_EXCLUDE"
+          for pattern in "${EXCLUDES[@]}"; do
+            CMD="$CMD --exclude \"$pattern\""
+          done
+        fi
+
+        echo "Running: $CMD"
+        eval $CMD
+
+        # Find the generated library file
+        if [ -n "$INPUT_VERSION" ]; then
+          LIBRARY_NAME="${INPUT_NAME}-${INPUT_VERSION}.libragen"
+        else
+          LIBRARY_NAME="${INPUT_NAME}.libragen"
+        fi
+        LIBRARY_PATH="${INPUT_OUTPUT}/${LIBRARY_NAME}"
+
+        echo "library-path=$LIBRARY_PATH" >> $GITHUB_OUTPUT
+        echo "library-name=$LIBRARY_NAME" >> $GITHUB_OUTPUT
+        echo "✅ Built: $LIBRARY_PATH"

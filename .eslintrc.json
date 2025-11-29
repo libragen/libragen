@@ -1,0 +1,18 @@
+{
+   "root": true,
+   "extends": "@silvermine/eslint-config/node",
+   "parserOptions": {
+      "project": true
+   },
+   "ignorePatterns": [
+      "node_modules/",
+      "dist/",
+      "coverage/"
+   ],
+   "rules": {
+      "no-process-env": "off",
+      "no-console": "off",
+      "no-empty-function": "off",
+      "@typescript-eslint/no-parameter-properties": "off"
+   }
+}

@@ -1,0 +1,85 @@
+---
+import { ArrowRight, Github } from 'lucide-react';
+import AsciinemaTerminal from '../ui/AsciinemaTerminal';
+import CopyButton from '../ui/CopyButton';
+---
+
+<section class="relative bg-gradient-to-b from-gray-50 to-white pb-16 pt-8 dark:from-gray-950 dark:to-gray-950">
+   <!-- Background decoration -->
+   <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute left-1/2 top-0 -translate-x-1/2 transform">
+         <div class="h-[500px] w-[800px] rounded-full bg-indigo-500/10 blur-3xl"></div>
+      </div>
+   </div>
+
+   <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <div class="text-center">
+         <!-- Badge -->
+         <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+            <span class="relative flex h-2 w-2">
+               <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75"></span>
+               <span class="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
+            </span>
+            MCP Compatible
+         </div>
+
+         <!-- Headline - Problem-focused -->
+         <h1 class="mx-auto max-w-4xl text-balance text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">
+            Stop Your AI From
+            <span class="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+               Hallucinating Code
+            </span>
+         </h1>
+
+         <!-- Subheadline - Solution -->
+         <p class="mx-auto mt-6 max-w-2xl text-lg text-gray-600 dark:text-gray-400 sm:text-xl">
+            Create private, local RAG libraries that work offline—no API keys, no cloud services. Share them as single files your whole team can use.
+         </p>
+
+         <!-- CTAs -->
+         <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <a
+               href="/docs/getting-started"
+               class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30"
+            >
+               Get Started
+               <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+               href="https://github.com/libragen/libragen"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 text-base font-semibold text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            >
+               <Github className="h-5 w-5" />
+               View on GitHub
+            </a>
+         </div>
+
+         <!-- Quick install -->
+         <div class="mt-8 flex justify-center">
+            <div class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-900 px-4 py-2 dark:border-gray-700">
+               <code class="text-sm text-gray-300">
+                  <span class="select-none text-gray-500">$ </span>npm install -g @libragen/cli
+               </code>
+               <CopyButton text="npm install -g @libragen/cli" client:load />
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Terminal Demo -->
+   <div class="mx-auto mt-12 max-w-3xl px-4 sm:px-6 lg:px-8">
+      <div class="shadow-2xl shadow-indigo-500/20 dark:shadow-indigo-500/10">
+         <AsciinemaTerminal
+            src="/demo.cast"
+            title="Terminal"
+            autoPlay={true}
+            loop={true}
+            speed={1.2}
+            idleTimeLimit={2}
+            rows={14}
+            client:load
+         />
+      </div>
+   </div>
+</section>

@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CollectionSearch from '../components/CollectionSearch';
+import collectionsData from '../data/collections.json';
+---
+
+<BaseLayout title="Libragen Collections - Browse & Install RAG Libraries">
+   <Header />
+
+   <main id="main-content">
+      <!-- Hero -->
+      <section class="bg-gradient-to-b from-indigo-50 to-white pb-16 pt-36 dark:from-gray-950 dark:to-gray-950">
+         <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+               Libragen
+               <span class="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+                  Collections
+               </span>
+            </h1>
+            <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+               Browse curated collections of RAG libraries. Install entire documentation sets with a single command.
+            </p>
+         </div>
+      </section>
+
+      <!-- Collections Grid -->
+      <section class="py-12">
+         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <CollectionSearch collections={collectionsData.collections} client:load />
+         </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="border-t border-gray-200 bg-gray-50 py-16 dark:border-gray-800 dark:bg-gray-900/50">
+         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h2 class="mb-8 text-center text-2xl font-bold text-gray-900 dark:text-white">How Collections Work</h2>
+            <div class="grid gap-8 md:grid-cols-3">
+               <div class="text-center">
+                  <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-xl font-bold text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
+                     1
+                  </div>
+                  <h3 class="mb-2 font-semibold text-gray-900 dark:text-white">Browse Collections</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                     Find collections that match your tech stack or project needs.
+                  </p>
+               </div>
+               <div class="text-center">
+                  <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-xl font-bold text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
+                     2
+                  </div>
+                  <h3 class="mb-2 font-semibold text-gray-900 dark:text-white">Install with One Command</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                     Run the install command to download all libraries in the collection.
+                  </p>
+               </div>
+               <div class="text-center">
+                  <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-xl font-bold text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
+                     3
+                  </div>
+                  <h3 class="mb-2 font-semibold text-gray-900 dark:text-white">Query with AI</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                     Use the MCP server to let your AI assistant search all installed libraries.
+                  </p>
+               </div>
+            </div>
+         </div>
+      </section>
+   </main>
+
+   <Footer />
+</BaseLayout>

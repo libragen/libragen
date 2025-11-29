@@ -1,0 +1,74 @@
+---
+import { Github, Package, Cpu, Star } from 'lucide-react';
+---
+
+<section class="border-y border-gray-200 bg-gray-50 py-16 dark:border-gray-800 dark:bg-gray-900/50">
+   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Stats row -->
+      <div class="flex flex-col items-center justify-center gap-8 sm:flex-row sm:gap-16">
+         <!-- GitHub stars (hidden until >= 50 stars) -->
+         <a
+            id="github-stars-link"
+            href="https://github.com/libragen/libragen"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group hidden items-center gap-3 rounded-full border border-gray-200 bg-white px-6 py-3 transition-all hover:border-primary-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-600"
+         >
+            <Github className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            <span class="font-medium text-gray-900 dark:text-white">Star on GitHub</span>
+            <span class="flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-sm font-semibold text-amber-700 dark:bg-amber-900/50 dark:text-amber-400">
+               <Star className="h-3.5 w-3.5" />
+               <span id="github-stars">—</span>
+            </span>
+         </a>
+
+         <!-- npm package -->
+         <a
+            href="https://www.npmjs.com/package/@libragen/cli"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex items-center gap-3 rounded-full border border-gray-200 bg-white px-6 py-3 transition-all hover:border-primary-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-600"
+         >
+            <Package className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <span class="font-medium text-gray-900 dark:text-white">@libragen/cli</span>
+         </a>
+
+         <!-- MCP Compatible badge -->
+         <div class="flex items-center gap-3 rounded-full border border-primary-200 bg-primary-50 px-6 py-3 dark:border-primary-800 dark:bg-primary-950">
+            <Cpu className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+            <span class="font-semibold text-primary-700 dark:text-primary-300">MCP Compatible</span>
+         </div>
+      </div>
+   </div>
+</section>
+
+<script>
+   const MIN_STARS_TO_SHOW = 50;
+
+   async function fetchGitHubStars() {
+      try {
+         const response = await fetch('https://api.github.com/repos/libragen/libragen');
+         if (response.ok) {
+            const data = await response.json();
+            const starCount = data.stargazers_count;
+
+            if (typeof starCount === 'number' && starCount >= MIN_STARS_TO_SHOW) {
+               const starsElement = document.getElementById('github-stars'),
+                     linkElement = document.getElementById('github-stars-link');
+
+               if (starsElement) {
+                  starsElement.textContent = starCount.toLocaleString();
+               }
+               if (linkElement) {
+                  linkElement.classList.remove('hidden');
+                  linkElement.classList.add('flex');
+               }
+            }
+         }
+      } catch {
+         // Silently fail - component stays hidden
+      }
+   }
+
+   fetchGitHubStars();
+</script>

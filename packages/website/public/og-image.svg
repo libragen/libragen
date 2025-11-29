@@ -1,0 +1,76 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <rect width="1200" height="630" fill="url(#bg-gradient)"/>
+
+  <!-- Subtle grid pattern -->
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(99, 102, 241, 0.08)" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23"/>
+      <stop offset="50%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="text-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#818cf8"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1100" cy="100" r="200" fill="url(#text-gradient)" opacity="0.1"/>
+  <circle cx="100" cy="530" r="150" fill="url(#text-gradient)" opacity="0.08"/>
+
+  <!-- Logo/Icon area - L shape with stacked layers matching header -->
+  <g transform="translate(100, 180)">
+    <!-- Bold L shape -->
+    <rect x="0" y="0" width="20" height="96" rx="4" fill="#6366F1"/>
+    <rect x="0" y="76" width="80" height="20" rx="4" fill="#6366F1"/>
+    <!-- Layered pages emerging -->
+    <rect x="28" y="12" width="52" height="8" rx="2" fill="#6366F1" opacity="0.3"/>
+    <rect x="28" y="28" width="52" height="8" rx="2" fill="#6366F1" opacity="0.5"/>
+    <rect x="28" y="44" width="52" height="8" rx="2" fill="#6366F1" opacity="0.7"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="200" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="white">
+    Libragen
+  </text>
+
+  <!-- Tagline -->
+  <text x="100" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="500" fill="#94a3b8">
+    Portable RAG Libraries for AI Agents
+  </text>
+
+  <!-- Features -->
+  <g transform="translate(100, 420)" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#64748b">
+    <text x="0" y="0">
+      <tspan fill="#818cf8">✓</tspan> Self-contained .libragen files
+    </text>
+    <text x="0" y="40">
+      <tspan fill="#818cf8">✓</tspan> Hybrid vector + keyword search
+    </text>
+    <text x="450" y="0">
+      <tspan fill="#818cf8">✓</tspan> Native MCP integration
+    </text>
+    <text x="450" y="40">
+      <tspan fill="#818cf8">✓</tspan> No cloud required
+    </text>
+  </g>
+
+  <!-- URL -->
+  <text x="100" y="580" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#818cf8">
+    libragen.dev
+  </text>
+
+  <!-- MCP badge -->
+  <g transform="translate(950, 540)">
+    <rect x="0" y="0" width="150" height="40" rx="20" fill="#818cf8" opacity="0.2"/>
+    <rect x="0" y="0" width="150" height="40" rx="20" stroke="#818cf8" stroke-width="2" fill="none"/>
+    <text x="75" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#818cf8" text-anchor="middle">
+      MCP Compatible
+    </text>
+  </g>
+</svg>

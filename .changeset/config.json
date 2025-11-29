@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "libragen/libragen" }
+  ],
+  "commit": false,
+  "fixed": [],
+  "linked": [
+    ["@libragen/core", "@libragen/cli", "@libragen/mcp"]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@libragen/website",
+    "@libragen/collections-site",
+    "@libragen/ui"
+  ]
+}

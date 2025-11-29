@@ -1,0 +1,94 @@
+{
+  "collections": [
+    {
+      "slug": "official",
+      "name": "Official Collection",
+      "description": "Curated libraries maintained by the libragen team, including popular frameworks and tools.",
+      "author": "libragen",
+      "url": "https://collections.libragen.dev/official/collection.json",
+      "libraries": [
+        {
+          "name": "react",
+          "description": "React documentation and API reference",
+          "version": "19.0.0",
+          "contentVersion": "19.0.0"
+        },
+        {
+          "name": "typescript",
+          "description": "TypeScript handbook and reference documentation",
+          "version": "5.7.0",
+          "contentVersion": "5.7.0"
+        },
+        {
+          "name": "tailwindcss",
+          "description": "Tailwind CSS utility-first framework documentation",
+          "version": "3.4.0",
+          "contentVersion": "3.4.0"
+        },
+        {
+          "name": "nodejs",
+          "description": "Node.js API documentation and guides",
+          "version": "22.0.0",
+          "contentVersion": "22.0.0"
+        }
+      ],
+      "updatedAt": "2025-11-30"
+    },
+    {
+      "slug": "ai-tools",
+      "name": "AI Tools Collection",
+      "description": "Documentation for AI/ML frameworks, LLM tools, and agent development libraries.",
+      "author": "libragen",
+      "url": "https://collections.libragen.dev/ai-tools/collection.json",
+      "libraries": [
+        {
+          "name": "langchain",
+          "description": "LangChain framework for building LLM applications",
+          "version": "0.3.0",
+          "contentVersion": "0.3.0"
+        },
+        {
+          "name": "openai",
+          "description": "OpenAI API reference and guides",
+          "version": "4.0.0",
+          "contentVersion": "4.0.0"
+        },
+        {
+          "name": "anthropic",
+          "description": "Anthropic Claude API documentation",
+          "version": "0.40.0",
+          "contentVersion": "0.40.0"
+        }
+      ],
+      "updatedAt": "2025-11-30"
+    },
+    {
+      "slug": "react-web",
+      "name": "React (Web) Collection",
+      "description": "Everything you need for React web development: React, Vite, and Next.js documentation.",
+      "author": "libragen",
+      "url": "https://collections.libragen.dev/react-web/collection.json",
+      "libraries": [
+        {
+          "name": "react",
+          "description": "React documentation and API reference",
+          "version": "19.0.0",
+          "contentVersion": "19.0.0"
+        },
+        {
+          "name": "vite",
+          "description": "Vite build tool and dev server documentation",
+          "version": "6.0.0",
+          "contentVersion": "6.0.0"
+        },
+        {
+          "name": "nextjs",
+          "description": "Next.js React framework documentation",
+          "version": "15.0.0",
+          "contentVersion": "15.0.0"
+        }
+      ],
+      "updatedAt": "2025-12-01"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+   "name": "@libragen/mcp",
+   "version": "0.1.0",
+   "description": "MCP server for querying libragen libraries from AI coding tools",
+   "type": "module",
+   "main": "./dist/index.js",
+   "types": "./dist/index.d.ts",
+   "bin": {
+      "libragen-mcp": "./dist/index.js"
+   },
+   "files": [
+      "dist"
+   ],
+   "scripts": {
+      "build": "tsc",
+      "test": "vitest run"
+   },
+   "keywords": [
+      "mcp",
+      "rag",
+      "libragen",
+      "model-context-protocol"
+   ],
+   "license": "MIT",
+   "engines": {
+      "node": ">=24.0.0"
+   },
+   "dependencies": {
+      "@libragen/core": "^0.1.0",
+      "@modelcontextprotocol/sdk": "1.23.0",
+      "better-sqlite3": "11.10.0",
+      "zod": "3.25.76"
+   }
+}

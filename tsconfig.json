@@ -1,0 +1,23 @@
+{
+   "extends": "./tsconfig.base.json",
+   "compilerOptions": {
+      "composite": true,
+      "outDir": "./dist",
+      "rootDir": "."
+   },
+   "include": [
+      "*.ts",
+      "packages/*/src/**/*.ts"
+   ],
+   "exclude": [
+      "node_modules",
+      "dist",
+      "packages/website",
+      "packages/collections-site"
+   ],
+   "references": [
+      { "path": "./packages/core" },
+      { "path": "./packages/cli" },
+      { "path": "./packages/mcp" }
+   ]
+}

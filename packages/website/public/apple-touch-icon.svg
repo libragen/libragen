@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="#1a1a2e"/>
+  <!-- Bold L shape with stacked layers - matches header logo -->
+  <rect x="30" y="30" width="35" height="120" rx="8" fill="#6366F1"/>
+  <rect x="30" y="115" width="120" height="35" rx="8" fill="#6366F1"/>
+  <!-- Layered pages emerging -->
+  <rect x="75" y="45" width="70" height="14" rx="4" fill="#6366F1" opacity="0.3"/>
+  <rect x="75" y="70" width="70" height="14" rx="4" fill="#6366F1" opacity="0.5"/>
+</svg>

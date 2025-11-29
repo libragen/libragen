@@ -1,0 +1,85 @@
+---
+import { Github, Package } from 'lucide-react';
+
+const productLinks = [
+   { label: 'Documentation', href: '/docs' },
+   { label: 'CLI Reference', href: '/docs/cli' },
+   { label: 'API Reference', href: '/docs/api' },
+   { label: 'Schemas', href: '/docs/schemas' },
+];
+
+const communityLinks = [
+   { label: 'GitHub', href: 'https://github.com/libragen/libragen', icon: Github },
+   { label: 'npm', href: 'https://www.npmjs.com/package/@libragen/cli', icon: Package },
+];
+---
+
+<footer class="border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900" role="contentinfo">
+   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+         <!-- Brand -->
+         <div>
+            <a href="/" class="flex items-center gap-2.5 text-xl font-bold text-gray-900 dark:text-white" aria-label="Libragen home">
+               <svg class="h-8 w-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="4" y="4" width="8" height="24" rx="2" fill="#6366F1" />
+                  <rect x="4" y="20" width="24" height="8" rx="2" fill="#6366F1" />
+                  <rect x="14" y="8" width="14" height="3" rx="1" fill="#6366F1" opacity="0.3" />
+                  <rect x="14" y="13" width="14" height="3" rx="1" fill="#6366F1" opacity="0.5" />
+               </svg>
+               <span class="tracking-tight">libragen</span>
+            </a>
+            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+               Portable RAG libraries for AI agents.<br />
+               Create, share, and query self-contained vector libraries.
+            </p>
+         </div>
+
+         <!-- Product Links -->
+         <div>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-white">
+               Product
+            </h3>
+            <ul class="mt-4 space-y-2">
+               {productLinks.map((link) => (
+                  <li>
+                     <a
+                        href={link.href}
+                        class="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                     >
+                        {link.label}
+                     </a>
+                  </li>
+               ))}
+            </ul>
+         </div>
+
+         <!-- Community Links -->
+         <div>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-white">
+               Community
+            </h3>
+            <ul class="mt-4 space-y-2">
+               {communityLinks.map((link) => (
+                  <li>
+                     <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                     >
+                        {link.icon && <link.icon className="h-4 w-4" />}
+                        {link.label}
+                     </a>
+                  </li>
+               ))}
+            </ul>
+         </div>
+      </div>
+
+      <div class="mt-8 border-t border-gray-200 pt-8 dark:border-gray-800">
+         <p class="text-center text-sm text-gray-500 dark:text-gray-500">
+            &copy; {new Date().getFullYear()} Libragen. MIT License.
+         </p>
+      </div>
+   </div>
+</footer>

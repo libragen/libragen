@@ -1,0 +1,48 @@
+{
+   "name": "@libragen/core",
+   "version": "0.1.0",
+   "description": "Core library for embedding, chunking, vector storage, and hybrid search",
+   "type": "module",
+   "main": "./dist/index.js",
+   "types": "./dist/index.d.ts",
+   "exports": {
+      ".": {
+         "types": "./dist/index.d.ts",
+         "import": "./dist/index.js"
+      },
+      "./schemas/collection.json": "./schemas/collection.schema.json",
+      "./schemas/collection-item.json": "./schemas/collection-item.schema.json",
+      "./schemas/collection-index.json": "./schemas/collection-index.schema.json",
+      "./schemas/library-metadata.json": "./schemas/library-metadata.schema.json"
+   },
+   "files": [
+      "dist",
+      "schemas"
+   ],
+   "scripts": {
+      "build": "tsc",
+      "test": "vitest run"
+   },
+   "keywords": [
+      "rag",
+      "embeddings",
+      "vector",
+      "search",
+      "sqlite"
+   ],
+   "license": "MIT",
+   "engines": {
+      "node": ">=24.0.0"
+   },
+   "dependencies": {
+      "@huggingface/transformers": "^3.5.1",
+      "@langchain/textsplitters": "^0.1.0",
+      "better-sqlite3": "^11.9.1",
+      "fast-glob": "^3.3.3",
+      "isomorphic-git": "1.35.1",
+      "sqlite-vec": "^0.1.6"
+   },
+   "devDependencies": {
+      "@types/better-sqlite3": "^7.6.13"
+   }
+}

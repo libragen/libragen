@@ -1,0 +1,42 @@
+---
+import { Github } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-950/80" role="banner">
+   <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2.5 text-xl text-gray-900 dark:text-white" aria-label="Collections home">
+         <svg class="h-8 w-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="4" width="8" height="24" rx="2" fill="#6366F1" />
+            <rect x="4" y="20" width="24" height="8" rx="2" fill="#6366F1" />
+            <rect x="14" y="8" width="14" height="3" rx="1" fill="#6366F1" opacity="0.3" />
+            <rect x="14" y="13" width="14" height="3" rx="1" fill="#6366F1" opacity="0.5" />
+         </svg>
+         <span class="flex items-baseline gap-1.5 tracking-tight">
+            <span class="font-bold">libragen</span>
+            <span class="text-base font-medium text-indigo-500 dark:text-indigo-400">/collections</span>
+         </span>
+      </a>
+
+      <!-- Navigation -->
+      <div class="flex items-center gap-6">
+         <a
+            href="https://libragen.dev/docs"
+            class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+         >
+            Docs
+         </a>
+         <a
+            href="https://github.com/libragen/libragen"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            aria-label="GitHub"
+         >
+            <Github className="h-5 w-5" />
+         </a>
+         <ThemeToggle client:load />
+      </div>
+   </nav>
+</header>
