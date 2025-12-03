@@ -39,9 +39,9 @@ libragen b <source> [options]
 | `-d, --description <text>` | Library description | — |
 | `--agent-description <text>` | Description for AI agents | — |
 | `--content-version <version>` | Content version (e.g., `v2.0.0`) | — |
-| `--content-version-type <type>` | Version type: `semver`, `date`, `commit` | — |
-| `-p, --patterns <patterns>` | Glob patterns to include | `**/*.{ts,js,...}` |
-| `-i, --ignore <patterns>` | Glob patterns to ignore | — |
+| `-i, --include <patterns>` | Glob patterns to include | — |
+| `-e, --exclude <patterns>` | Glob patterns to exclude (added to defaults) | — |
+| `--no-default-excludes` | Disable default exclusions (node_modules, .git, etc.) | — |
 | `--chunk-size <size>` | Target chunk size in characters | `1000` |
 | `--chunk-overlap <size>` | Overlap between chunks | `100` |
 | `--git-ref <ref>` | Git branch, tag, or commit (remote git sources only) | — |
@@ -78,7 +78,7 @@ libragen build ./src \
    -n "My Library" \
    -d "A helpful library" \
    --content-version "v2.0.0" \
-   --patterns "**/*.ts" "**/*.md"
+   --include "**/*.ts" "**/*.md"
 
 # Build with explicit license
 libragen build ./src --license MIT

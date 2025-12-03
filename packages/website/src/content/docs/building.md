@@ -24,10 +24,10 @@ This processes all markdown, text, and HTML files, generating embeddings and a f
 | `.html` | HTML (text extracted) |
 | `.mdx` | MDX (treated as markdown) |
 
-Customize with `--extensions`:
+Customize with `--include`:
 
 ```bash
-libragen build ./docs --name my-docs --extensions ".md,.rst,.txt"
+libragen build ./docs --name my-docs --include "**/*.md" "**/*.rst" "**/*.txt"
 ```
 
 ## Chunking Strategy

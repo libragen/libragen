@@ -40,8 +40,9 @@ libragen build <source> [options]
 | `--output`, `-o` | string | Current dir | Output directory |
 | `--description`, `-d` | string | — | Library description |
 | `--content-version` | string | — | Version tag for the content |
-| `--extensions` | string[] | `.md,.txt,.html` | File extensions to process |
-| `--exclude` | string[] | — | Glob patterns to exclude |
+| `--include`, `-i` | string[] | — | Glob patterns to include |
+| `--exclude`, `-e` | string[] | — | Glob patterns to exclude (added to defaults) |
+| `--no-default-excludes` | boolean | `false` | Disable default exclusions |
 | `--chunk-size` | number | `1000` | Target chunk size in characters |
 | `--chunk-overlap` | number | `100` | Overlap between chunks |
 | `--license` | string[] | Auto-detected | SPDX license identifier(s) for the source |
