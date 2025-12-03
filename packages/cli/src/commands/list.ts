@@ -12,6 +12,7 @@ import type { InstalledLibrary, InstalledCollection } from '@libragen/core';
 interface ListOptions {
    json?: boolean;
    verbose?: boolean;
+   showPath?: boolean;
    path?: string[];
    libraries?: boolean;
    collections?: boolean;
@@ -22,6 +23,7 @@ export const listCommand = new Command('list')
    .description('List installed libraries and collections')
    .option('--json', 'Output as JSON')
    .option('-v, --verbose', 'Show detailed information')
+   .option('--show-path', 'Show the file path for each library')
    .option('-p, --path <paths...>', 'Library path(s) to use (excludes global and auto-detection)')
    .option('--libraries', 'Show only libraries')
    .option('--collections', 'Show only collections')
@@ -59,7 +61,7 @@ export const listCommand = new Command('list')
 
          // Show libraries
          if (showLibraries && libraries.length > 0) {
-            printLibraries(libraries, options.verbose);
+            printLibraries(libraries, options.verbose, options.showPath);
          }
       } catch(error) {
          console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : String(error)}`));
@@ -104,7 +106,7 @@ function printCollectionDetails(col: InstalledCollection): void {
    }
 }
 
-function printLibraries(libraries: InstalledLibrary[], verbose?: boolean): void {
+function printLibraries(libraries: InstalledLibrary[], verbose?: boolean, showPath?: boolean): void {
    console.log(chalk.bold(`\n📚 Installed Libraries (${libraries.length})\n`));
 
    for (const lib of libraries) {
@@ -113,6 +115,10 @@ function printLibraries(libraries: InstalledLibrary[], verbose?: boolean): void 
          : chalk.dim('[global]');
 
       console.log(`  ${chalk.bold(lib.name)} ${chalk.dim(`v${lib.version}`)} ${locationBadge}`);
+
+      if (showPath) {
+         console.log(`    ${chalk.dim(lib.path)}`);
+      }
 
       if (lib.contentVersion) {
          console.log(`    ${chalk.dim('Content:')} ${lib.contentVersion}`);

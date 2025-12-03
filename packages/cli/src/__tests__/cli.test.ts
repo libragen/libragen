@@ -199,6 +199,7 @@ describe('CLI', () => {
       it('queries library by name using resolution', async () => {
          // Install the library first
          const projectDir = path.join(tempDir, 'query-name-test');
+
          const libDir = path.join(projectDir, 'libs');
 
          await fs.mkdir(libDir, { recursive: true });
@@ -217,6 +218,7 @@ describe('CLI', () => {
          ]);
 
          const listData = JSON.parse(listResult.stdout);
+
          const installedName = listData.libraries[0]?.name;
 
          // Query by library name (not path)
@@ -236,6 +238,7 @@ describe('CLI', () => {
 
       it('fails for non-existent library name', async () => {
          const projectDir = path.join(tempDir, 'query-name-fail-test');
+
          const libDir = path.join(projectDir, 'libs');
 
          await fs.mkdir(libDir, { recursive: true });
@@ -254,6 +257,7 @@ describe('CLI', () => {
       it('queries library by name with JSON output', async () => {
          // Install the library first
          const projectDir = path.join(tempDir, 'query-name-json-test');
+
          const libDir = path.join(projectDir, 'libs');
 
          await fs.mkdir(libDir, { recursive: true });
@@ -272,6 +276,7 @@ describe('CLI', () => {
          ]);
 
          const listData = JSON.parse(listResult.stdout);
+
          const installedName = listData.libraries[0]?.name;
 
          // Query by library name with JSON output
@@ -306,6 +311,7 @@ describe('CLI', () => {
          expect(stdout).toContain('List installed libraries');
          expect(stdout).toContain('--json');
          expect(stdout).toContain('--verbose');
+         expect(stdout).toContain('--show-path');
       });
 
       it('handles empty library list', async () => {
@@ -348,6 +354,67 @@ describe('CLI', () => {
          expect(data).toHaveProperty('collections');
          expect(Array.isArray(data.libraries)).toBe(true);
          expect(Array.isArray(data.collections)).toBe(true);
+      });
+
+      it('shows library paths with --show-path flag', async () => {
+         // Install a library first
+         const projectDir = path.join(tempDir, 'list-path-test');
+
+         const libDir = path.join(projectDir, 'libs');
+
+         await fs.mkdir(libDir, { recursive: true });
+
+         // Build and install a library
+         const libPath = path.join(tempDir, 'list-path-test.libragen');
+
+         await runCli([
+            'build',
+            FIXTURES_DIR,
+            '-o', libPath,
+         ]);
+
+         await runCli([
+            'install',
+            libPath,
+            '-p', libDir,
+         ]);
+
+         // List with --show-path
+         const { stdout, exitCode } = await runCli([
+            'list',
+            '-p', libDir,
+            '--libraries',
+            '--show-path',
+         ]);
+
+         expect(exitCode).toBe(0);
+         expect(stdout).toContain('Installed Libraries');
+         // Should show the .libragen path
+         expect(stdout).toContain('.libragen');
+         expect(stdout).toContain(libDir);
+      }, 60000);
+
+      it('JSON output includes path and location', async () => {
+         // Use the library installed in the previous test
+         const projectDir = path.join(tempDir, 'list-path-test');
+
+         const libDir = path.join(projectDir, 'libs');
+
+         const { stdout, exitCode } = await runCli([
+            'list',
+            '-p', libDir,
+            '--libraries',
+            '--json',
+         ]);
+
+         expect(exitCode).toBe(0);
+
+         const data = JSON.parse(stdout);
+
+         expect(data.libraries.length).toBeGreaterThan(0);
+         expect(data.libraries[0]).toHaveProperty('path');
+         expect(data.libraries[0]).toHaveProperty('location');
+         expect(data.libraries[0].path).toContain('.libragen');
       });
    });
 

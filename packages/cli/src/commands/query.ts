@@ -30,6 +30,154 @@ function isFilePath(value: string): boolean {
    return value.includes('/') || value.includes('\\') || value.endsWith('.libragen');
 }
 
+/**
+ * Resolve a library path from either a file path or library name.
+ */
+async function resolveLibraryPath(
+   library: string,
+   paths: string[] | undefined,
+   spinner: ReturnType<typeof ora>,
+   isJson: boolean
+): Promise<string> {
+   if (isFilePath(library)) {
+      const libraryPath = path.resolve(library);
+
+      try {
+         await fs.access(libraryPath);
+      } catch(_e) {
+         console.error(chalk.red(`Error: Library not found: ${libraryPath}`));
+         process.exit(1);
+      }
+
+      return libraryPath;
+   }
+
+   // Treat as a library name - use LibraryManager to resolve
+   if (!isJson) {
+      spinner.start(`Resolving library '${library}'...`);
+   }
+
+   const manager = new LibraryManager(paths ? { paths } : undefined);
+
+   const installed = await manager.find(library);
+
+   if (!installed) {
+      if (!isJson) {
+         spinner.fail(`Library '${library}' not found`);
+      }
+      console.error(chalk.red(`\nError: Library '${library}' is not installed.`));
+      console.error(chalk.dim('Use `libragen list` to see installed libraries.'));
+      process.exit(1);
+   }
+
+   if (!isJson) {
+      spinner.succeed(`Found library at ${chalk.dim(installed.path)}`);
+   }
+
+   return installed.path;
+}
+
+/**
+ * Print search results to the console.
+ */
+function printResults(
+   results: Awaited<ReturnType<Searcher['search']>>,
+   contextBefore: number | undefined,
+   contextAfter: number | undefined
+): void {
+   if (results.length === 0) {
+      console.log(chalk.yellow('\nNo results found.'));
+      return;
+   }
+
+   console.log(chalk.bold(`\n📚 Found ${results.length} results:\n`));
+
+   const hasContext = Boolean(contextBefore || contextAfter);
+
+   for (const [ index, result ] of results.entries()) {
+      printSingleResult(result, index, hasContext);
+   }
+}
+
+/**
+ * Print a single search result.
+ */
+function printSingleResult(
+   result: Awaited<ReturnType<Searcher['search']>>[number],
+   index: number,
+   hasContext: boolean | undefined
+): void {
+   const sourceInfo = result.sourceFile
+      ? chalk.dim(path.basename(result.sourceFile))
+      : chalk.dim('unknown source');
+
+   const lineInfo = result.startLine ? chalk.dim(`:${result.startLine}`) : '';
+
+   console.log(chalk.bold.cyan(`${index + 1}. ${sourceInfo}${lineInfo}`));
+   console.log(chalk.dim(`   Score: ${result.score.toFixed(4)}`));
+
+   if (result.contentVersion) {
+      console.log(chalk.dim(`   Version: ${result.contentVersion}`));
+   }
+
+   console.log('');
+
+   printContextBefore(result);
+   printMainContent(result, hasContext);
+   printContextAfter(result);
+
+   console.log('');
+}
+
+function printContextBefore(result: Awaited<ReturnType<Searcher['search']>>[number]): void {
+   if (!result.contextBefore || result.contextBefore.length === 0) {
+      return;
+   }
+
+   for (const chunk of result.contextBefore) {
+      const ctxLine = chunk.startLine ? `:${chunk.startLine}` : '';
+
+      console.log(chalk.dim(`   [context${ctxLine}]`));
+      console.log(chalk.dim(`   ${chunk.content.trim().split('\n').join('\n   ')}`));
+      console.log('');
+   }
+   console.log(chalk.dim('   --- match ---'));
+   console.log('');
+}
+
+function printMainContent(
+   result: Awaited<ReturnType<Searcher['search']>>[number],
+   hasContext: boolean | undefined
+): void {
+   const content = result.content.trim();
+
+   if (hasContext) {
+      console.log(`   ${content.split('\n').join('\n   ')}`);
+   } else {
+      const maxLength = 200,
+            truncated = content.length > maxLength ? content.slice(0, maxLength) + '...' : content;
+
+      console.log(`   ${truncated.split('\n').join('\n   ')}`);
+   }
+}
+
+function printContextAfter(result: Awaited<ReturnType<Searcher['search']>>[number]): void {
+   if (!result.contextAfter || result.contextAfter.length === 0) {
+      return;
+   }
+
+   console.log('');
+   console.log(chalk.dim('   --- match ---'));
+
+   for (const chunk of result.contextAfter) {
+      const ctxLine = chunk.startLine ? `:${chunk.startLine}` : '';
+
+      console.log('');
+      console.log(chalk.dim(`   [context${ctxLine}]`));
+      console.log(chalk.dim(`   ${chunk.content.trim().split('\n').join('\n   ')}`));
+   }
+}
+
 export const queryCommand = new Command('query')
    .alias('q')
    .description('Search a .libragen library')
@@ -46,51 +194,17 @@ export const queryCommand = new Command('query')
       const spinner = ora();
 
       try {
-         let libraryPath: string;
-
-         if (isFilePath(options.library)) {
-            // Treat as a file path
-            libraryPath = path.resolve(options.library);
-
-            try {
-               await fs.access(libraryPath);
-            } catch(_e) {
-               console.error(chalk.red(`Error: Library not found: ${libraryPath}`));
-               process.exit(1);
-            }
-         } else {
-            // Treat as a library name - use LibraryManager to resolve
-            if (!options.json) {
-               spinner.start(`Resolving library '${options.library}'...`);
-            }
-
-            const manager = new LibraryManager(
-               options.path ? { paths: options.path } : undefined
-            );
-
-            const installed = await manager.find(options.library);
-
-            if (!installed) {
-               if (!options.json) {
-                  spinner.fail(`Library '${options.library}' not found`);
-               }
-               console.error(chalk.red(`\nError: Library '${options.library}' is not installed.`));
-               console.error(chalk.dim('Use `libragen list` to see installed libraries.'));
-               process.exit(1);
-            }
-
-            libraryPath = installed.path;
-
-            if (!options.json) {
-               spinner.succeed(`Found library at ${chalk.dim(libraryPath)}`);
-            }
-         }
+         const libraryPath = await resolveLibraryPath(
+            options.library,
+            options.path,
+            spinner,
+            Boolean(options.json)
+         );
 
          if (!options.json) {
             spinner.start('Loading embedding model...');
          }
 
-         // Initialize components
          const embedder = new Embedder();
 
          await embedder.initialize();
@@ -103,10 +217,8 @@ export const queryCommand = new Command('query')
 
          store.initialize();
 
-         const searcher = new Searcher(embedder, store);
-
-         // Parse options
-         const k = parseInt(options.k || '5', 10),
+         const searcher = new Searcher(embedder, store),
+               k = parseInt(options.k || '5', 10),
                hybridAlpha = parseFloat(options.hybridAlpha || '0.5'),
                contextBefore = options.contextBefore ? parseInt(options.contextBefore, 10) : undefined,
                contextAfter = options.contextAfter ? parseInt(options.contextAfter, 10) : undefined;
@@ -115,7 +227,6 @@ export const queryCommand = new Command('query')
             spinner.start('Searching...');
          }
 
-         // Perform search
          const results = await searcher.search({
             query,
             k,
@@ -129,84 +240,12 @@ export const queryCommand = new Command('query')
             spinner.stop();
          }
 
-         // Output results
          if (options.json) {
             console.log(JSON.stringify(results, null, 2));
          } else {
-            if (results.length === 0) {
-               console.log(chalk.yellow('\nNo results found.'));
-            }
-
-            if (results.length > 0) {
-               console.log(chalk.bold(`\n📚 Found ${results.length} results:\n`));
-
-               const hasContext = contextBefore || contextAfter;
-
-               results.forEach((result, index) => {
-                  const sourceInfo = result.sourceFile
-                     ? chalk.dim(path.basename(result.sourceFile))
-                     : chalk.dim('unknown source');
-
-                  const lineInfo = result.startLine
-                     ? chalk.dim(`:${result.startLine}`)
-                     : '';
-
-                  console.log(chalk.bold.cyan(`${index + 1}. ${sourceInfo}${lineInfo}`));
-                  console.log(chalk.dim(`   Score: ${result.score.toFixed(4)}`));
-
-                  if (result.contentVersion) {
-                     console.log(chalk.dim(`   Version: ${result.contentVersion}`));
-                  }
-
-                  console.log('');
-
-                  // Show context before
-                  if (result.contextBefore && result.contextBefore.length > 0) {
-                     for (const chunk of result.contextBefore) {
-                        const ctxLine = chunk.startLine ? `:${chunk.startLine}` : '';
-
-                        console.log(chalk.dim(`   [context${ctxLine}]`));
-                        console.log(chalk.dim(`   ${chunk.content.trim().split('\n').join('\n   ')}`));
-                        console.log('');
-                     }
-                     console.log(chalk.dim('   --- match ---'));
-                     console.log('');
-                  }
-
-                  // Show main content (full if context requested, truncated otherwise)
-                  const content = result.content.trim();
-
-                  if (hasContext) {
-                     console.log(`   ${content.split('\n').join('\n   ')}`);
-                  } else {
-                     const maxLength = 200;
-
-                     const truncated = content.length > maxLength
-                        ? content.slice(0, maxLength) + '...'
-                        : content;
-
-                     console.log(`   ${truncated.split('\n').join('\n   ')}`);
-                  }
-
-                  // Show context after
-                  if (result.contextAfter && result.contextAfter.length > 0) {
-                     console.log('');
-                     console.log(chalk.dim('   --- match ---'));
-                     for (const chunk of result.contextAfter) {
-                        const ctxLine = chunk.startLine ? `:${chunk.startLine}` : '';
-
-                        console.log('');
-                        console.log(chalk.dim(`   [context${ctxLine}]`));
-                        console.log(chalk.dim(`   ${chunk.content.trim().split('\n').join('\n   ')}`));
-                     }
-                  }
-
-                  console.log('');
-               });
-            }
+            printResults(results, contextBefore, contextAfter);
          }
 
-         // Cleanup
          store.close();
          await embedder.dispose();
       } catch(error) {

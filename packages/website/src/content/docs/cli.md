@@ -189,10 +189,20 @@ libragen list [options]
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `-p, --path` | string[] | — | Library path(s) to use (excludes global and auto-detection) |
-| `-v, --verbose` | boolean | `false` | Show detailed information |
-| `--json` | boolean | `false` | Output as JSON |
+| `-v, --verbose` | boolean | `false` | Show detailed information (path, chunks, size, keywords) |
+| `--show-path` | boolean | `false` | Show the file path for each library |
+| `--json` | boolean | `false` | Output as JSON (includes path and location) |
 | `--libraries` | boolean | `false` | Show only libraries |
 | `--collections` | boolean | `false` | Show only collections |
+
+#### Output
+
+Each library displays:
+- **Name and version**
+- **Location badge**: `[project]` or `[global]` indicating where the library was found
+- **Path** (with `--show-path` or `-v`): full file path to the `.libragen` file
+
+The location badge helps identify which libraries come from project-local directories vs the global directory.
 
 #### Library Discovery
 
@@ -209,17 +219,38 @@ When `-p` is specified, **only** the provided path(s) are searched—no global d
 # List all libraries (auto-detected + global)
 libragen list
 
+# List with file paths shown
+libragen list --show-path
+
 # List only project-local libraries
 libragen list -p .libragen/libraries
 
 # List from multiple specific paths
 libragen list -p ./libs -p ./vendor/libs
+
+# JSON output for scripting (includes path and location)
+libragen list --json
 ```
 
+**Example output:**
+
 ```
-NAME          VERSION    CHUNKS    SIZE
-my-docs       1.0.0      1,247     12.4 MB
-react-docs    19.0.0     3,892     45.2 MB
+📚 Installed Libraries (2)
+
+  my-docs v1.0.0 [project]
+  react-docs v19.0.0 [global]
+```
+
+**With `--show-path`:**
+
+```
+📚 Installed Libraries (2)
+
+  my-docs v1.0.0 [project]
+    /path/to/project/.libragen/libraries/my-docs-1.0.0.libragen
+
+  react-docs v19.0.0 [global]
+    /Users/you/.libragen/libraries/react-docs-19.0.0.libragen
 ```
 
 ---

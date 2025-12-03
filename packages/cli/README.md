@@ -272,11 +272,20 @@ libragen l [options]
 
 | Option | Description |
 |--------|-------------|
-| `-v, --verbose` | Show detailed information |
+| `-v, --verbose` | Show detailed information (path, chunks, size, keywords, etc.) |
+| `--show-path` | Show the file path for each library |
 | `-p, --path <paths...>` | Library path(s) to use (excludes global and auto-detection) |
-| `--json` | Output as JSON |
+| `--json` | Output as JSON (includes path and location for each library) |
 | `--libraries` | Show only libraries |
 | `--collections` | Show only collections |
+
+**Output:**
+
+Each library shows:
+- Name and version
+- Location badge: `[project]` or `[global]`
+- With `--show-path`: full file path
+- With `-v, --verbose`: path, chunk count, file size, keywords, languages
 
 **Library Discovery:**
 
