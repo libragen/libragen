@@ -22,7 +22,8 @@
       "website:preview": "npm run preview --workspace=@libragen/website",
       "collections:dev": "npm run dev --workspace=@libragen/collections-site",
       "collections:build": "npm run build --workspace=@libragen/collections-site",
-      "collections:preview": "npm run preview --workspace=@libragen/collections-site"
+      "collections:preview": "npm run preview --workspace=@libragen/collections-site",
+      "prepare": "husky"
    },
    "keywords": [
       "rag",
@@ -48,6 +49,7 @@
       "@types/react": "19.1.6",
       "@types/react-dom": "19.1.5",
       "eslint": "^8.57.1",
+      "husky": "9.1.7",
       "tsx": "4.21.0",
       "typescript": "^5.9.3",
       "typescript-json-schema": "0.67.0",
