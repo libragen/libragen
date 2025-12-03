@@ -99,7 +99,7 @@ for (const config of schemas) {
    if (schema) {
       // Add metadata
       schema.$schema = 'http://json-schema.org/draft-07/schema#';
-      schema.$id = `https://libragen.dev/schemas/${config.fileName.replace('.schema.json', '.json')}`;
+      schema.$id = `https://libragen.dev/schemas/v1/${config.fileName}`;
       schema.title = config.title;
       schema.description = config.description;
 

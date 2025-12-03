@@ -211,7 +211,7 @@
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://libragen.dev/schemas/library-metadata.json",
+  "$id": "https://libragen.dev/schemas/v1/library-metadata.schema.json",
   "title": "Libragen Library Metadata",
   "description": "Metadata stored inside .libragen files describing the library contents"
 }

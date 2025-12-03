@@ -16,6 +16,6 @@
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://libragen.dev/schemas/collection-item.json",
+  "$id": "https://libragen.dev/schemas/v1/collection-item.schema.json",
   "title": "Libragen Collection Item"
 }
