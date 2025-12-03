@@ -7,7 +7,7 @@ branding:
 
 inputs:
   source:
-    description: 'Source directory containing documentation files'
+    description: 'Source directory, file, or git URL to index'
     required: true
     default: './docs'
   name:
@@ -16,8 +16,32 @@ inputs:
   version:
     description: 'Library version (omit to use unversioned filename)'
     required: false
+  content-version:
+    description: 'Version of the source content being indexed'
+    required: false
   description:
-    description: 'Library description'
+    description: 'Short description of the library'
+    required: false
+  agent-description:
+    description: 'Guidance for AI agents on when to use this library'
+    required: false
+  example-queries:
+    description: 'Example queries this library can answer (comma-separated)'
+    required: false
+  keywords:
+    description: 'Searchable keywords/tags (comma-separated)'
+    required: false
+  programming-languages:
+    description: 'Programming languages covered, e.g., typescript,python (comma-separated)'
+    required: false
+  text-languages:
+    description: 'Human/natural languages as ISO 639-1 codes, e.g., en,es,zh (comma-separated)'
+    required: false
+  frameworks:
+    description: 'Frameworks covered, e.g., react,express (comma-separated)'
+    required: false
+  license:
+    description: 'SPDX license identifier(s) for the source content (comma-separated)'
     required: false
   output:
     description: 'Output directory for the library file'
@@ -29,11 +53,21 @@ inputs:
   chunk-overlap:
     description: 'Chunk overlap in characters'
     required: false
-  extensions:
-    description: 'File extensions to process (comma-separated)'
+  include:
+    description: 'Glob patterns to include (comma-separated)'
     required: false
   exclude:
     description: 'Glob patterns to exclude (comma-separated)'
+    required: false
+  no-default-excludes:
+    description: 'Disable default exclusions (node_modules, .git, dist, etc.)'
+    required: false
+    default: 'false'
+  git-ref:
+    description: 'Git branch, tag, or commit to checkout (remote git sources only)'
+    required: false
+  git-repo-auth-token:
+    description: 'Auth token for private git repositories (remote git sources only)'
     required: false
   node-version:
     description: 'Node.js version to use'
@@ -74,12 +108,23 @@ runs:
         INPUT_SOURCE: ${{ inputs.source }}
         INPUT_NAME: ${{ inputs.name }}
         INPUT_VERSION: ${{ inputs.version }}
+        INPUT_CONTENT_VERSION: ${{ inputs.content-version }}
         INPUT_DESCRIPTION: ${{ inputs.description }}
+        INPUT_AGENT_DESCRIPTION: ${{ inputs.agent-description }}
+        INPUT_EXAMPLE_QUERIES: ${{ inputs.example-queries }}
+        INPUT_KEYWORDS: ${{ inputs.keywords }}
+        INPUT_PROGRAMMING_LANGUAGES: ${{ inputs.programming-languages }}
+        INPUT_TEXT_LANGUAGES: ${{ inputs.text-languages }}
+        INPUT_FRAMEWORKS: ${{ inputs.frameworks }}
+        INPUT_LICENSE: ${{ inputs.license }}
         INPUT_OUTPUT: ${{ inputs.output }}
         INPUT_CHUNK_SIZE: ${{ inputs.chunk-size }}
         INPUT_CHUNK_OVERLAP: ${{ inputs.chunk-overlap }}
-        INPUT_EXTENSIONS: ${{ inputs.extensions }}
+        INPUT_INCLUDE: ${{ inputs.include }}
         INPUT_EXCLUDE: ${{ inputs.exclude }}
+        INPUT_NO_DEFAULT_EXCLUDES: ${{ inputs.no-default-excludes }}
+        INPUT_GIT_REF: ${{ inputs.git-ref }}
+        INPUT_GIT_REPO_AUTH_TOKEN: ${{ inputs.git-repo-auth-token }}
       run: |
         # Build the command
         CMD="npx -y @libragen/cli build \"$INPUT_SOURCE\" --name \"$INPUT_NAME\""
@@ -88,8 +133,58 @@ runs:
           CMD="$CMD --version \"$INPUT_VERSION\""
         fi
 
+        if [ -n "$INPUT_CONTENT_VERSION" ]; then
+          CMD="$CMD --content-version \"$INPUT_CONTENT_VERSION\""
+        fi
+
         if [ -n "$INPUT_DESCRIPTION" ]; then
           CMD="$CMD --description \"$INPUT_DESCRIPTION\""
+        fi
+
+        if [ -n "$INPUT_AGENT_DESCRIPTION" ]; then
+          CMD="$CMD --agent-description \"$INPUT_AGENT_DESCRIPTION\""
+        fi
+
+        if [ -n "$INPUT_EXAMPLE_QUERIES" ]; then
+          IFS=',' read -ra QUERIES <<< "$INPUT_EXAMPLE_QUERIES"
+          for query in "${QUERIES[@]}"; do
+            CMD="$CMD --example-queries \"$query\""
+          done
+        fi
+
+        if [ -n "$INPUT_KEYWORDS" ]; then
+          IFS=',' read -ra KW <<< "$INPUT_KEYWORDS"
+          for kw in "${KW[@]}"; do
+            CMD="$CMD --keywords \"$kw\""
+          done
+        fi
+
+        if [ -n "$INPUT_PROGRAMMING_LANGUAGES" ]; then
+          IFS=',' read -ra LANGS <<< "$INPUT_PROGRAMMING_LANGUAGES"
+          for lang in "${LANGS[@]}"; do
+            CMD="$CMD --programming-languages \"$lang\""
+          done
+        fi
+
+        if [ -n "$INPUT_TEXT_LANGUAGES" ]; then
+          IFS=',' read -ra LANGS <<< "$INPUT_TEXT_LANGUAGES"
+          for lang in "${LANGS[@]}"; do
+            CMD="$CMD --text-languages \"$lang\""
+          done
+        fi
+
+        if [ -n "$INPUT_FRAMEWORKS" ]; then
+          IFS=',' read -ra FW <<< "$INPUT_FRAMEWORKS"
+          for fw in "${FW[@]}"; do
+            CMD="$CMD --frameworks \"$fw\""
+          done
+        fi
+
+        if [ -n "$INPUT_LICENSE" ]; then
+          IFS=',' read -ra LIC <<< "$INPUT_LICENSE"
+          for lic in "${LIC[@]}"; do
+            CMD="$CMD --license \"$lic\""
+          done
         fi
 
         if [ -n "$INPUT_OUTPUT" ]; then
@@ -104,16 +199,30 @@ runs:
           CMD="$CMD --chunk-overlap $INPUT_CHUNK_OVERLAP"
         fi
 
-        if [ -n "$INPUT_EXTENSIONS" ]; then
-          CMD="$CMD --extensions $INPUT_EXTENSIONS"
+        if [ -n "$INPUT_INCLUDE" ]; then
+          IFS=',' read -ra INCLUDES <<< "$INPUT_INCLUDE"
+          for pattern in "${INCLUDES[@]}"; do
+            CMD="$CMD --include \"$pattern\""
+          done
         fi
 
         if [ -n "$INPUT_EXCLUDE" ]; then
-          # Split comma-separated excludes into multiple --exclude flags
           IFS=',' read -ra EXCLUDES <<< "$INPUT_EXCLUDE"
           for pattern in "${EXCLUDES[@]}"; do
             CMD="$CMD --exclude \"$pattern\""
           done
+        fi
+
+        if [ "$INPUT_NO_DEFAULT_EXCLUDES" = "true" ]; then
+          CMD="$CMD --no-default-excludes"
+        fi
+
+        if [ -n "$INPUT_GIT_REF" ]; then
+          CMD="$CMD --git-ref \"$INPUT_GIT_REF\""
+        fi
+
+        if [ -n "$INPUT_GIT_REPO_AUTH_TOKEN" ]; then
+          CMD="$CMD --git-repo-auth-token \"$INPUT_GIT_REPO_AUTH_TOKEN\""
         fi
 
         echo "Running: $CMD"

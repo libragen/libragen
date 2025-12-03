@@ -54,15 +54,26 @@ jobs:
 
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `source` | Yes | `./docs` | Source directory containing docs |
+| `source` | Yes | `./docs` | Source directory, file, or git URL |
 | `name` | Yes | — | Library name |
 | `version` | No | — | Library version (adds to filename) |
-| `description` | No | — | Library description |
+| `content-version` | No | — | Version of source content being indexed |
+| `description` | No | — | Short description of the library |
+| `agent-description` | No | — | Guidance for AI agents on when to use this library |
+| `example-queries` | No | — | Example queries (comma-separated) |
+| `keywords` | No | — | Searchable keywords/tags (comma-separated) |
+| `programming-languages` | No | — | Programming languages covered (comma-separated) |
+| `text-languages` | No | — | Human languages as ISO 639-1 codes (comma-separated) |
+| `frameworks` | No | — | Frameworks covered (comma-separated) |
+| `license` | No | — | SPDX license identifier(s) (comma-separated) |
 | `output` | No | `.` | Output directory |
 | `chunk-size` | No | — | Target chunk size |
 | `chunk-overlap` | No | — | Chunk overlap |
-| `extensions` | No | — | File extensions (comma-separated) |
-| `exclude` | No | — | Exclude patterns (comma-separated) |
+| `include` | No | — | Glob patterns to include (comma-separated) |
+| `exclude` | No | — | Glob patterns to exclude (comma-separated) |
+| `no-default-excludes` | No | `false` | Disable default exclusions |
+| `git-ref` | No | — | Git branch/tag/commit (remote sources only) |
+| `git-repo-auth-token` | No | — | Auth token for private repos |
 | `cache-model` | No | `true` | Cache embedding model |
 
 ### Action Outputs
