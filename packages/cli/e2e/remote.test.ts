@@ -45,7 +45,7 @@ describe('E2E: Remote Git Sources', () => {
             'build', 'https://github.com/jonschlinkert/is-odd',
             '-o', libraryPath,
             '-n', 'is-odd-lib',
-            '--patterns', '**/*.js', '**/*.md',
+            '--include', '**/*.js', '**/*.md',
          ], env);
 
          if (exitCode !== 0) {
@@ -105,7 +105,7 @@ describe('E2E: Remote Git Sources', () => {
             'build', 'https://github.com/chalk/chalk/tree/v5.0.0',
             '-o', libraryPath,
             '-n', 'chalk-v5',
-            '--patterns', 'source/**/*.js', '**/*.md',
+            '--include', 'source/**/*.js', '**/*.md',
          ], env);
 
          if (exitCode !== 0) {
@@ -150,7 +150,7 @@ describe('E2E: Remote Git Sources', () => {
             'build', 'https://github.com/expressjs/express',
             '-o', libraryPath,
             '-n', 'express-lib',
-            '--patterns', 'lib/**/*.js',
+            '--include', 'lib/**/*.js',
          ], env);
 
          if (exitCode !== 0) {
@@ -183,7 +183,7 @@ describe('E2E: Remote Git Sources', () => {
             'build', 'https://github.com/lodash/lodash/tree/main/.internal',
             '-o', libraryPath,
             '-n', 'lodash-internal',
-            '--patterns', '**/*.js',
+            '--include', '**/*.js',
          ], env);
 
          // This might fail if the repo structure changed, that's okay for E2E
