@@ -96,10 +96,10 @@ export async function createTestEnv(): Promise<TestEnv> {
 
    const workDir = path.join(home, 'workspace');
 
-   const librariesDir = path.join(home, 'libraries');
-
    await fs.mkdir(workDir, { recursive: true });
-   await fs.mkdir(librariesDir, { recursive: true });
+
+   // Note: We intentionally do NOT pre-create the libraries directory.
+   // The CLI should create $LIBRAGEN_HOME/libraries on first install.
 
    // Share model cache to avoid re-downloads during tests
    // Falls back to a shared temp location if not set

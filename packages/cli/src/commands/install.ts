@@ -12,7 +12,7 @@ import chalk from 'chalk';
 import { LibraryManager, CollectionClient } from '@libragen/core';
 
 interface InstallOptions {
-   path?: string;
+   path?: string[];
    force?: boolean;
    collection?: string;
    contentVersion?: string;
@@ -23,7 +23,7 @@ interface InstallOptions {
 export const installCommand = new Command('install')
    .description('Install a library or collection')
    .argument('<source>', 'Library file (.libragen), collection file (.json), or URL')
-   .option('-p, --path <path>', 'Install to specific directory (default: global or auto-detected project)')
+   .option('-p, --path <paths...>', 'Library path(s) to use (excludes global and auto-detection)')
    .option('-f, --force', 'Overwrite existing libraries')
    .option('-c, --collection <url>', 'Legacy: Collection URL to search for library name')
    .option('--content-version <version>', 'Install specific content version')
@@ -37,7 +37,7 @@ export const installCommand = new Command('install')
          // global)
          const manager = new LibraryManager(
             options.path
-               ? { paths: [ options.path ] }
+               ? { paths: options.path }
                : undefined
          );
 

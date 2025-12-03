@@ -313,7 +313,7 @@ libragen install <source> [options]
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `-p, --path` | string | — | Install to specific directory (default: global or auto-detected project) |
+| `-p, --path` | string[] | — | Library path(s) to use (excludes global and auto-detection) |
 | `-f, --force` | boolean | `false` | Overwrite existing library |
 | `-c, --collection` | string | — | Collection URL to use |
 | `--content-version` | string | — | Install specific content version |
@@ -327,6 +327,9 @@ libragen install ./my-lib.libragen
 
 # Install to specific directory
 libragen install ./my-lib.libragen -p .libragen/libraries
+
+# Install to multiple paths (first path is used for install)
+libragen install ./my-lib.libragen -p ./libs -p ./vendor/libs
 
 # Install from collection
 libragen install react-docs

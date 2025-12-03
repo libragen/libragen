@@ -299,7 +299,7 @@ libragen install <source> [options]
 
 | Option | Description |
 |--------|-------------|
-| `-p, --path <path>` | Install to specific directory (default: global or auto-detected project) |
+| `-p, --path <paths...>` | Library path(s) to use (excludes global and auto-detection) |
 | `-f, --force` | Overwrite existing library |
 | `-c, --collection <url>` | Collection URL to use |
 | `--content-version <version>` | Install specific content version |
@@ -313,6 +313,9 @@ libragen install ./my-lib.libragen
 
 # Install to specific directory
 libragen install ./my-lib.libragen -p .libragen/libraries
+
+# Install to multiple paths (first path is used for install)
+libragen install ./my-lib.libragen -p ./libs -p ./vendor/libs
 
 # Install from collection (when configured)
 libragen install some-library
