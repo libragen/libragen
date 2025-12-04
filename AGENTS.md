@@ -193,3 +193,5 @@ Follow conventional commits:
 4. **Breaking the MCP server** - Test with actual MCP clients when possible
 5. **Ignoring TypeScript errors** - Fix all errors before committing
 6. **Creating ad-hoc test scripts** - Use the existing test infrastructure
+7. **Using scoped commits** - Use conventional commits but do not scope them
+8. **Linting errors** - Run `npm run standards` as a final check before finishing a task
