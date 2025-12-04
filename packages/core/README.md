@@ -303,15 +303,15 @@ const library = await Library.create('./lib.libragen', {
 });
 
 // Add content
-await library.addChunks(chunks, embedder);
+library.addChunks(chunks, embeddings);
 
-// Finalize (computes content hash, updates stats)
-await library.finalize();
+// Close (automatically finalizes if chunks were added)
+await library.close();
 
 // Open existing library
 const lib = await Library.open('./lib.libragen');
 const metadata = lib.getMetadata();
-lib.close();
+await lib.close();
 
 // Validate a library
 const { valid, errors, warnings } = await Library.validate('./lib.libragen');

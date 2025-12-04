@@ -324,7 +324,7 @@ describe('Library migration integration', () => {
 
          expect(dbVersion).toBe(String(CURRENT_SCHEMA_VERSION));
 
-         library.close();
+         await library.close();
       });
    });
 
@@ -357,7 +357,7 @@ describe('Library migration integration', () => {
          // Metadata should have schemaVersion
          expect(library.getMetadata().schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
 
-         library.close();
+         await library.close();
       });
 
       it('refuses migration in read-only mode', async () => {
@@ -389,7 +389,7 @@ describe('Library migration integration', () => {
             name: 'current-library',
          });
 
-         library.close();
+         await library.close();
 
          // Open should work without issues
          const reopened = await Library.open(libraryPath);
@@ -397,7 +397,7 @@ describe('Library migration integration', () => {
          expect(reopened.getMetadata().name).toBe('current-library');
          expect(reopened.getMetadata().schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
 
-         reopened.close();
+         await reopened.close();
       });
 
       it('opens in read-only mode when no migration needed', async () => {
@@ -406,14 +406,14 @@ describe('Library migration integration', () => {
             name: 'current-library',
          });
 
-         library.close();
+         await library.close();
 
          // Open in read-only mode should work
          const reopened = await Library.open(libraryPath, { readOnly: true });
 
          expect(reopened.getMetadata().name).toBe('current-library');
 
-         reopened.close();
+         await reopened.close();
       });
    });
 
@@ -484,7 +484,7 @@ describe('LibraryMetadata.schemaVersion', () => {
 
       expect(library.getMetadata().schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
 
-      library.close();
+      await library.close();
    });
 
    it('is populated correctly on open', async () => {
@@ -492,12 +492,12 @@ describe('LibraryMetadata.schemaVersion', () => {
          name: 'test-library',
       });
 
-      library.close();
+      await library.close();
 
       const reopened = await Library.open(libraryPath);
 
       expect(reopened.getMetadata().schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
 
-      reopened.close();
+      await reopened.close();
    });
 });

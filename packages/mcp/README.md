@@ -19,20 +19,21 @@ Model Context Protocol (MCP) server that enables AI assistants like Claude Deskt
 
 **[Full documentation →](https://libragen.dev)**
 
-## Installation
+## Quick Setup
+
+Install the libragen MCP server with one command:
 
 ```bash
-npm install -g @libragen/mcp
+npx -y install-mcp @libragen/mcp
 ```
 
-## Integration
+This automatically detects and configures your AI tool (Claude Desktop, Cursor, Windsurf, VS Code, etc.).
 
-### Claude Desktop
+After installation, restart your AI tool to load the server.
 
-Add to your Claude Desktop configuration file:
+## Manual Configuration
 
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+If you prefer manual setup or need custom options, add this to your tool's MCP configuration:
 
 ```json
 {
@@ -45,21 +46,7 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-### VS Code with Continue
-
-Add to your Continue configuration:
-
-```json
-{
-   "mcpServers": [
-      {
-         "name": "libragen",
-         "command": "npx",
-         "args": ["-y", "@libragen/mcp"]
-      }
-   ]
-}
-```
+See [install-mcp documentation](https://www.npmjs.com/package/install-mcp) for config file locations by tool.
 
 ## Library Discovery
 
@@ -335,23 +322,55 @@ Create a collection file grouping multiple libraries.
 | `name` | string | Name for the collection |
 | `libraries` | string (optional) | Comma-separated list of library paths |
 
-## Library Discovery
+## Custom Library Directory
 
-The MCP server automatically discovers libraries from:
-
-| Platform | Location |
-|----------|----------|
-| macOS | `~/Library/Application Support/libragen/libraries` |
-| Linux | `~/.local/share/libragen/libraries` |
-| Windows | `%APPDATA%\libragen\libraries` |
-
-Install libraries using the CLI:
+To use libraries from a custom location, set the `LIBRAGEN_HOME` environment variable:
 
 ```bash
-libragen install my-library.libragen
+# Install with custom library path
+LIBRAGEN_HOME=/path/to/your/libragen npx -y install-mcp @libragen/mcp
 ```
 
-Or use the `libragen_install` tool directly from your AI assistant.
+Or add it manually to your MCP config:
+
+```json
+{
+   "mcpServers": {
+      "libragen": {
+         "command": "npx",
+         "args": ["-y", "@libragen/mcp"],
+         "env": {
+            "LIBRAGEN_HOME": "/path/to/your/libragen"
+         }
+      }
+   }
+}
+```
+
+## Tips for Best Results
+
+1. **Be specific** - "Search react-docs for useEffect dependency arrays" works better than "how does useEffect work"
+2. **Name your libraries clearly** - The AI uses library names to understand what's available
+3. **Add descriptions** - When building libraries, include descriptions so the AI knows what each library contains
+4. **Version your content** - Use `contentVersion` when building so you can reference specific versions
+
+## Troubleshooting
+
+### Server not loading
+
+1. Verify the MCP config syntax is valid JSON
+2. Check that `npx` is in your PATH
+3. Restart your AI tool completely
+
+### No libraries found
+
+1. Check that libraries exist in the default location
+2. Verify with `libragen list` in your terminal
+3. Try setting `LIBRAGEN_HOME` explicitly
+
+### Slow first query
+
+The first query downloads the embedding model (~50MB). Subsequent queries are fast.
 
 ## Pre-warming
 

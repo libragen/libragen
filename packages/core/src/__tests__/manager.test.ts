@@ -48,7 +48,7 @@ describe('LibraryManager', () => {
          contentVersion: '2.0.0',
       });
 
-      lib.close();
+      await lib.close();
       return libPath;
    }
 
@@ -69,7 +69,7 @@ describe('LibraryManager', () => {
          contentVersion: '2.0.0',
       });
 
-      lib.close();
+      await lib.close();
       return libPath;
    }
 
@@ -396,7 +396,7 @@ describe('LibraryManager', () => {
          expect(lib).toBeInstanceOf(Library);
          expect(lib.getMetadata().name).toBe('openme');
 
-         lib.close();
+         await lib.close();
       });
 
       it('throws for nonexistent library', async () => {

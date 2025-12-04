@@ -213,46 +213,45 @@ A `.libragen` file is a SQLite database containing:
 Use `@libragen/core` directly in your TypeScript/JavaScript projects:
 
 ```typescript
-import { Library, Searcher } from '@libragen/core';
+import { Library, Searcher, Embedder, Reranker } from '@libragen/core';
 
 // Open an existing library and search it
 const library = await Library.open('./my-docs.libragen');
-const searcher = new Searcher(library.store);
 
-const results = await searcher.search('how do I authenticate?', {
-   limit: 5,
+const embedder = new Embedder();
+await embedder.initialize();
+
+const reranker = new Reranker();
+await reranker.initialize();
+
+const searcher = new Searcher(embedder, library.getStore(), { reranker });
+
+const results = await searcher.search({
+   query: 'how do I authenticate?',
+   k: 5,
    rerank: true,  // Use cross-encoder reranking
 });
 
 for (const result of results) {
-   console.log(`[${result.score.toFixed(3)}] ${result.filePath}`);
+   console.log(`[${result.score.toFixed(3)}] ${result.sourceFile}`);
    console.log(result.content);
-}
-```
-
-```typescript
-import { Library, Embedder, Chunker, FileSource } from '@libragen/core';
-
-// Build a library from scratch
-const library = await Library.create('./output.libragen', {
-   name: 'my-docs',
-   description: 'Internal API documentation',
-});
-
-const source = new FileSource('./docs', { extensions: ['.md', '.mdx'] });
-const files = await source.getFiles();
-
-const chunker = new Chunker();
-const embedder = new Embedder();
-await embedder.initialize();
-
-for (const file of files) {
-   const chunks = chunker.chunk(file.content, { filePath: file.path });
-   const embeddings = await embedder.embedBatch(chunks.map(c => c.content));
-   await library.store.addChunks(chunks, embeddings);
 }
 
 await library.close();
+```
+
+```typescript
+import { Builder } from '@libragen/core';
+
+// Build a library from source files
+const builder = new Builder();
+const result = await builder.build('./docs', {
+   name: 'my-docs',
+   description: 'Internal API documentation',
+   include: ['**/*.md', '**/*.mdx'],
+});
+
+console.log(`Built ${result.outputPath} with ${result.stats.chunkCount} chunks`);
 ```
 
 ## 🛠️ Development

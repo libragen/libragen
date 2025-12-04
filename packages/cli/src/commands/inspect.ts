@@ -99,7 +99,7 @@ async function inspectLibrary(filePath: string, json: boolean, spinner: ReturnTy
 
    const stats = await fs.stat(filePath);
 
-   library.close();
+   await library.close();
 
    spinner.stop();
 

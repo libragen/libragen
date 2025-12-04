@@ -41,7 +41,7 @@ describe('Library', () => {
          expect(metadata.version).toBe('0.1.0');
          expect(metadata.createdAt).toBeDefined();
 
-         library.close();
+         await library.close();
 
          // Verify file was created
          const stats = await fs.stat(libraryPath);
@@ -89,7 +89,7 @@ describe('Library', () => {
          expect(metadata.embedding.model).toBe('test-model');
          expect(metadata.chunking.chunkSize).toBe(500);
 
-         library.close();
+         await library.close();
       });
 
       it('throws if file already exists', async () => {
@@ -112,7 +112,7 @@ describe('Library', () => {
             description: 'Test description',
          });
 
-         created.close();
+         await created.close();
 
          // Open it
          const opened = await Library.open(libraryPath);
@@ -120,7 +120,7 @@ describe('Library', () => {
          expect(opened.getMetadata().name).toBe('test-library');
          expect(opened.getMetadata().description).toBe('Test description');
 
-         opened.close();
+         await opened.close();
       });
 
       it('throws if file does not exist', async () => {
@@ -138,7 +138,7 @@ describe('Library', () => {
             name: 'valid-library',
          });
 
-         library.close();
+         await library.close();
 
          const result = await Library.validate(libraryPath);
 
@@ -163,7 +163,7 @@ describe('Library', () => {
 
          metadata.stats.chunkCount = 999;
          library.setMetadata(metadata);
-         library.close();
+         await library.close();
 
          const result = await Library.validate(libraryPath);
 
@@ -212,7 +212,7 @@ describe('Library', () => {
 
          expect(chunk1?.content).toBe('First chunk content');
 
-         library.close();
+         await library.close();
       });
    });
 
@@ -235,7 +235,7 @@ describe('Library', () => {
          expect(hash1).toBe(hash2);
          expect(hash1).toMatch(/^sha256:[a-f0-9]{64}$/);
 
-         library.close();
+         await library.close();
       });
 
       it('computes different hash for different content', async () => {
@@ -251,7 +251,7 @@ describe('Library', () => {
 
          const hash1 = await library1.computeContentHash();
 
-         library1.close();
+         await library1.close();
 
          // Create second library
          const libraryPath2 = path.join(tempDir, 'test2.libragen');
@@ -267,7 +267,7 @@ describe('Library', () => {
 
          const hash2 = await library2.computeContentHash();
 
-         library2.close();
+         await library2.close();
 
          expect(hash1).not.toBe(hash2);
       });
@@ -297,7 +297,7 @@ describe('Library', () => {
          expect(metadata.stats.fileSize).toBeGreaterThan(0);
          expect(metadata.contentHash).toMatch(/^sha256:[a-f0-9]{64}$/);
 
-         library.close();
+         await library.close();
       });
    });
 
@@ -313,7 +313,7 @@ describe('Library', () => {
          );
 
          await library.finalize();
-         library.close();
+         await library.close();
 
          // Reopen and verify
          const reopened = await Library.open(libraryPath);
@@ -322,7 +322,7 @@ describe('Library', () => {
 
          expect(isValid).toBe(true);
 
-         reopened.close();
+         await reopened.close();
       });
 
       it('returns false when hash is missing', async () => {
@@ -331,7 +331,7 @@ describe('Library', () => {
          });
 
          // Don't call finalize, so no hash is set
-         library.close();
+         await library.close();
 
          const reopened = await Library.open(libraryPath);
 
@@ -339,7 +339,7 @@ describe('Library', () => {
 
          expect(isValid).toBe(false);
 
-         reopened.close();
+         await reopened.close();
       });
    });
 
@@ -360,14 +360,14 @@ describe('Library', () => {
          expect(metadata.description).toBe('Updated description');
          expect(metadata.keywords).toEqual([ 'new', 'keywords' ]);
 
-         library.close();
+         await library.close();
 
          // Verify persistence
          const reopened = await Library.open(libraryPath);
 
          expect(reopened.getMetadata().description).toBe('Updated description');
 
-         reopened.close();
+         await reopened.close();
       });
    });
 });

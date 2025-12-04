@@ -66,7 +66,7 @@ describe('Installation E2E', () => {
          contentVersion: version,
       });
 
-      lib.close();
+      await lib.close();
       return libPath;
    }
 

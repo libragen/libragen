@@ -104,6 +104,8 @@ export class Library {
    private readonly _store: VectorStore;
    private readonly _path: string;
    private _metadata: LibraryMetadata | null = null;
+   private _chunksAdded = false;
+   private _finalized = false;
 
    private constructor(path: string, store: VectorStore) {
       this._path = path;
@@ -369,6 +371,8 @@ export class Library {
    ): number[] {
       const ids = this._store.addChunks(chunks, embeddings, options);
 
+      this._chunksAdded = true;
+
       // Update stats
       if (this._metadata) {
          this._metadata.stats.chunkCount = this._store.getChunkCount();
@@ -422,12 +426,18 @@ export class Library {
 
    /**
     * Finalize the library after adding all content. Updates stats and computes content
-    * hash.
+    * hash. This is called automatically by `close()` if chunks were added.
     */
    public async finalize(): Promise<void> {
       if (!this._metadata) {
          throw new Error('Library metadata not loaded');
       }
+
+      if (this._finalized) {
+         return;
+      }
+
+      this._finalized = true;
 
       // Update chunk count
       this._metadata.stats.chunkCount = this._store.getChunkCount();
@@ -445,9 +455,13 @@ export class Library {
    }
 
    /**
-    * Close the library and release resources.
+    * Close the library and release resources. If chunks were added and `finalize()`
+    * was not called, this will automatically finalize the library first.
     */
-   public close(): void {
+   public async close(): Promise<void> {
+      if (this._chunksAdded && !this._finalized) {
+         await this.finalize();
+      }
       this._store.close();
    }
 
