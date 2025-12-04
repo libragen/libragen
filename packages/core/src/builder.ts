@@ -320,7 +320,14 @@ export class Builder {
          // Resolve output path
          const outputPath = await this._resolveOutputPath(opts.output, libraryName, libraryVersion, resolved.isGit);
 
-         // Phase 2: Initialize embedder
+         // Phase 2: Chunk source files BEFORE loading model
+         // This ensures we fail fast on empty directories without loading the model
+         const chunkSize = opts.chunkSize ?? 1000,
+               chunkOverlap = opts.chunkOverlap ?? 100;
+
+         const chunks = await this._chunkSource(resolved, opts, chunkSize, chunkOverlap, progress);
+
+         // Phase 3: Initialize embedder (only after we know we have content)
          progress({ phase: 'loading-model', progress: 20, message: 'Loading embedding model...' });
 
          const embedder = this._config.embedder ?? new Embedder();
@@ -329,12 +336,6 @@ export class Builder {
 
          try {
             await embedder.initialize();
-
-            // Phase 3: Chunk source files
-            const chunkSize = opts.chunkSize ?? 1000,
-                  chunkOverlap = opts.chunkOverlap ?? 100;
-
-            const chunks = await this._chunkSource(resolved, opts, chunkSize, chunkOverlap, progress);
 
             // Phase 4: Generate embeddings
             const embeddingResult = await this._generateEmbeddings(chunks, embedder, progress);

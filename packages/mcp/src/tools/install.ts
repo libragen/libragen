@@ -38,8 +38,22 @@ After installation, use libragen_search to query the installed libraries.`,
    server.registerTool('libragen_install', toolConfig, async (params) => {
       const { source, force = false, includeOptional = false } = params,
             // Use discovered library paths from MCP roots
-            paths = getLibraryPaths(),
-            manager = new LibraryManager({ paths });
+            paths = getLibraryPaths();
+
+      // Validate we have a valid install path
+      if (paths.length === 0) {
+         return {
+            content: [
+               {
+                  type: 'text' as const,
+                  text: 'Error: No library directory available. ' +
+                     'Ensure LIBRAGEN_HOME or HOME environment variable is set.',
+               },
+            ],
+         };
+      }
+
+      const manager = new LibraryManager({ paths });
 
       // Determine source type
       const isCollection = manager.isCollection(source),

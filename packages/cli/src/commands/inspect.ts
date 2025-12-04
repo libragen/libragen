@@ -11,7 +11,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import * as tar from 'tar';
 import { Library, formatBytes } from '@libragen/core';
-import type { CollectionDefinition } from '@libragen/core';
+import type { CollectionDefinition, LibraryMetadata } from '@libragen/core';
 
 export const inspectCommand = new Command('inspect')
    .description('Inspect the contents of a library (.libragen) or packed collection (.libragen-collection)')
@@ -104,37 +104,57 @@ async function inspectLibrary(filePath: string, json: boolean, spinner: ReturnTy
    spinner.stop();
 
    if (json) {
-      console.log(JSON.stringify({
-         type: 'library',
-         file: filePath,
-         fileSize: stats.size,
-         metadata: {
-            name: metadata.name,
-            version: metadata.version,
-            description: metadata.description,
-            agentDescription: metadata.agentDescription,
-            contentVersion: metadata.contentVersion,
-            contentVersionType: metadata.contentVersionType,
-            schemaVersion: metadata.schemaVersion,
-            createdAt: metadata.createdAt,
-            embedding: metadata.embedding,
-            chunking: metadata.chunking,
-            stats: metadata.stats,
-            license: metadata.license,
-            source: metadata.source,
-            keywords: metadata.keywords,
-            programmingLanguages: metadata.programmingLanguages,
-            frameworks: metadata.frameworks,
-         },
-      }, null, 2));
-
-      return;
+      printLibraryJson(filePath, stats.size, metadata);
+   } else {
+      printLibraryHuman(filePath, stats.size, metadata);
    }
+}
 
+function printLibraryJson(filePath: string, fileSize: number, metadata: LibraryMetadata): void {
+   console.log(JSON.stringify({
+      type: 'library',
+      file: filePath,
+      fileSize,
+      metadata: {
+         name: metadata.name,
+         version: metadata.version,
+         description: metadata.description,
+         agentDescription: metadata.agentDescription,
+         exampleQueries: metadata.exampleQueries,
+         contentVersion: metadata.contentVersion,
+         contentVersionType: metadata.contentVersionType,
+         schemaVersion: metadata.schemaVersion,
+         createdAt: metadata.createdAt,
+         embedding: metadata.embedding,
+         chunking: metadata.chunking,
+         stats: metadata.stats,
+         license: metadata.license,
+         source: metadata.source,
+         keywords: metadata.keywords,
+         programmingLanguages: metadata.programmingLanguages,
+         textLanguages: metadata.textLanguages,
+         frameworks: metadata.frameworks,
+      },
+   }, null, 2));
+}
+
+function printLibraryHuman(filePath: string, fileSize: number, metadata: LibraryMetadata): void {
    console.log(chalk.bold('\n📚 Library Contents\n'));
    console.log(`  ${chalk.dim('File:')}    ${filePath}`);
-   console.log(`  ${chalk.dim('Size:')}    ${formatBytes(stats.size)}`);
+   console.log(`  ${chalk.dim('Size:')}    ${formatBytes(fileSize)}`);
 
+   printMetadataSection(metadata);
+   printStatsSection(metadata);
+   printEmbeddingSection(metadata);
+   printChunkingSection(metadata);
+   printSourceSection(metadata);
+   printTagsSection(metadata);
+   printAgentSection(metadata);
+
+   console.log('');
+}
+
+function printMetadataSection(metadata: LibraryMetadata): void {
    console.log('');
    console.log(chalk.bold('  Metadata:'));
    console.log(`    ${chalk.dim('Name:')}        ${metadata.name}`);
@@ -145,51 +165,65 @@ async function inspectLibrary(filePath: string, json: boolean, spinner: ReturnTy
    }
 
    if (metadata.contentVersion) {
-      // eslint-disable-next-line max-len
-      console.log(`    ${chalk.dim('Content:')}     ${metadata.contentVersion}${metadata.contentVersionType ? ` (${metadata.contentVersionType})` : ''}`);
+      const suffix = metadata.contentVersionType ? ` (${metadata.contentVersionType})` : '';
+
+      console.log(`    ${chalk.dim('Content:')}     ${metadata.contentVersion}${suffix}`);
    }
 
    console.log(`    ${chalk.dim('Schema:')}      v${metadata.schemaVersion}`);
    console.log(`    ${chalk.dim('Created:')}     ${metadata.createdAt}`);
+}
 
+function printStatsSection(metadata: LibraryMetadata): void {
    console.log('');
    console.log(chalk.bold('  Stats:'));
    console.log(`    ${chalk.dim('Chunks:')}      ${metadata.stats.chunkCount.toLocaleString()}`);
    console.log(`    ${chalk.dim('Sources:')}     ${metadata.stats.sourceCount.toLocaleString()} files`);
+}
 
-   if (metadata.embedding) {
-      console.log('');
-      console.log(chalk.bold('  Embedding:'));
-      console.log(`    ${chalk.dim('Model:')}       ${metadata.embedding.model}`);
-      console.log(`    ${chalk.dim('Dimensions:')}  ${metadata.embedding.dimensions}`);
+function printEmbeddingSection(metadata: LibraryMetadata): void {
+   if (!metadata.embedding) {
+      return;
+   }
+   console.log('');
+   console.log(chalk.bold('  Embedding:'));
+   console.log(`    ${chalk.dim('Model:')}       ${metadata.embedding.model}`);
+   console.log(`    ${chalk.dim('Dimensions:')}  ${metadata.embedding.dimensions}`);
+}
+
+function printChunkingSection(metadata: LibraryMetadata): void {
+   if (!metadata.chunking) {
+      return;
+   }
+   console.log('');
+   console.log(chalk.bold('  Chunking:'));
+   console.log(`    ${chalk.dim('Strategy:')}    ${metadata.chunking.strategy}`);
+   console.log(`    ${chalk.dim('Chunk size:')}  ${metadata.chunking.chunkSize} chars`);
+   console.log(`    ${chalk.dim('Overlap:')}     ${metadata.chunking.chunkOverlap} chars`);
+}
+
+function printSourceSection(metadata: LibraryMetadata): void {
+   if (!metadata.source) {
+      return;
+   }
+   console.log('');
+   console.log(chalk.bold('  Source:'));
+   console.log(`    ${chalk.dim('Type:')}        ${metadata.source.type}`);
+
+   if (metadata.source.url) {
+      console.log(`    ${chalk.dim('URL:')}         ${metadata.source.url}`);
    }
 
-   if (metadata.chunking) {
-      console.log('');
-      console.log(chalk.bold('  Chunking:'));
-      console.log(`    ${chalk.dim('Strategy:')}    ${metadata.chunking.strategy}`);
-      console.log(`    ${chalk.dim('Chunk size:')}  ${metadata.chunking.chunkSize} chars`);
-      console.log(`    ${chalk.dim('Overlap:')}     ${metadata.chunking.chunkOverlap} chars`);
+   if (metadata.source.ref) {
+      console.log(`    ${chalk.dim('Ref:')}         ${metadata.source.ref}`);
    }
 
-   if (metadata.source) {
-      console.log('');
-      console.log(chalk.bold('  Source:'));
-      console.log(`    ${chalk.dim('Type:')}        ${metadata.source.type}`);
-
-      if (metadata.source.url) {
-         console.log(`    ${chalk.dim('URL:')}         ${metadata.source.url}`);
-      }
-
-      if (metadata.source.ref) {
-         console.log(`    ${chalk.dim('Ref:')}         ${metadata.source.ref}`);
-      }
-
-      if (metadata.source.commitHash) {
-         console.log(`    ${chalk.dim('Commit:')}      ${metadata.source.commitHash.substring(0, 12)}`);
-      }
+   if (metadata.source.commitHash) {
+      console.log(`    ${chalk.dim('Commit:')}      ${metadata.source.commitHash.substring(0, 12)}`);
    }
+}
 
+function printTagsSection(metadata: LibraryMetadata): void {
    if (metadata.license && metadata.license.length > 0) {
       console.log('');
       console.log(chalk.bold('  License(s):'));
@@ -217,7 +251,28 @@ async function inspectLibrary(filePath: string, json: boolean, spinner: ReturnTy
       console.log(`    ${metadata.frameworks.join(', ')}`);
    }
 
-   console.log('');
+   if (metadata.textLanguages && metadata.textLanguages.length > 0) {
+      console.log('');
+      console.log(chalk.bold('  Text Languages:'));
+      console.log(`    ${metadata.textLanguages.join(', ')}`);
+   }
+}
+
+function printAgentSection(metadata: LibraryMetadata): void {
+   if (metadata.agentDescription) {
+      console.log('');
+      console.log(chalk.bold('  Agent Description:'));
+      console.log(`    ${metadata.agentDescription}`);
+   }
+
+   if (metadata.exampleQueries && metadata.exampleQueries.length > 0) {
+      console.log('');
+      console.log(chalk.bold('  Example Queries:'));
+
+      for (const query of metadata.exampleQueries) {
+         console.log(`    • ${query}`);
+      }
+   }
 }
 
 async function inspectCollection(filePath: string, json: boolean, spinner: ReturnType<typeof ora>): Promise<void> {

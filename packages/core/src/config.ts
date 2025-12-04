@@ -39,22 +39,39 @@ export function getLibragenHome(): string {
       return envHome;
    }
 
+   // Get home directory with fallback
+   // os.homedir() can return empty string in some environments (e.g., MCP subprocess)
+   let homeDir = os.homedir();
+
+   if (!homeDir || homeDir === '/') {
+      // Fallback to HOME or USERPROFILE environment variables
+      // eslint-disable-next-line no-process-env
+      homeDir = process.env.HOME || process.env.USERPROFILE || '';
+
+      if (!homeDir) {
+         throw new Error(
+            'Unable to determine home directory. Set LIBRAGEN_HOME environment variable ' +
+            'or ensure HOME is set.'
+         );
+      }
+   }
+
    const platform = os.platform();
 
    if (platform === 'darwin') {
       // macOS: ~/Library/Application Support/libragen
-      return path.join(os.homedir(), 'Library', 'Application Support', 'libragen');
+      return path.join(homeDir, 'Library', 'Application Support', 'libragen');
    } else if (platform === 'win32') {
       // Windows: %APPDATA%\libragen
       // eslint-disable-next-line no-process-env
-      const appData = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
+      const appData = process.env.APPDATA || path.join(homeDir, 'AppData', 'Roaming');
 
       return path.join(appData, 'libragen');
    }
 
    // Linux/other: $XDG_DATA_HOME/libragen (defaults to ~/.local/share/libragen)
    // eslint-disable-next-line no-process-env
-   const xdgDataHome = process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share');
+   const xdgDataHome = process.env.XDG_DATA_HOME || path.join(homeDir, '.local', 'share');
 
    return path.join(xdgDataHome, 'libragen');
 }

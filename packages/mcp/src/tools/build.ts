@@ -245,6 +245,21 @@ The resulting library can be searched with libragen_search to find relevant cont
             const libraryPaths = getLibraryPaths(),
                   installPath = libraryPaths.length > 0 ? libraryPaths[0] : undefined;
 
+            // Validate install path if install is requested
+            if (params.install && !installPath) {
+               return {
+                  content: [
+                     {
+                        type: 'text' as const,
+                        text: JSON.stringify({
+                           error: 'Cannot install: no library directory available. ' +
+                              'Ensure LIBRAGEN_HOME or HOME environment variable is set.',
+                        }),
+                     },
+                  ],
+               };
+            }
+
             // Build params for the task
             const buildParams: BuildParams = {
                source: params.source,
