@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "bash scripts/build.sh",
-    "build:schemas": "cp ../../schemas/*.schema.json ./public/schemas/v1/",
+    "build:schemas": "cp ../core/schemas/*.schema.json ./public/schemas/v1/",
     "preview": "astro preview"
   },
   "dependencies": {

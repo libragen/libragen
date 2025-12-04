@@ -1,19 +1,25 @@
 {
+  "description": "Metadata stored inside .libragen files describing the library contents",
   "type": "object",
   "properties": {
     "name": {
+      "description": "Unique name for the library (e.g., \"react-docs\", \"rust-std\")",
       "type": "string"
     },
     "version": {
+      "description": "Library version in semver format (e.g., \"1.0.0\")",
       "type": "string"
     },
     "schemaVersion": {
+      "description": "Schema version for database compatibility",
       "type": "number"
     },
     "contentVersion": {
+      "description": "Version of the source content (e.g., \"1.74.0\" for Rust docs)",
       "type": "string"
     },
     "contentVersionType": {
+      "description": "Type of content versioning used",
       "enum": [
         "commit",
         "custom",
@@ -24,6 +30,7 @@
       "type": "string"
     },
     "displayName": {
+      "description": "Human-readable display name",
       "type": "string"
     },
     "description": {
@@ -171,10 +178,11 @@
   ],
   "definitions": {
     "SourceProvenance": {
-      "description": "Core type definitions for",
+      "description": "Information about the source of a library's content.\nTracks where the content came from for provenance and reproducibility.",
       "type": "object",
       "properties": {
         "type": {
+          "description": "Source type: 'local' for filesystem, 'git' for git repositories",
           "enum": [
             "git",
             "local"
@@ -182,23 +190,23 @@
           "type": "string"
         },
         "path": {
-          "description": "For local sources: the absolute path",
+          "description": "For local sources: the absolute path to the source directory or file",
           "type": "string"
         },
         "url": {
-          "description": "For git sources: the repository URL",
+          "description": "For git sources: the repository URL (e.g., \"https://github.com/owner/repo\")",
           "type": "string"
         },
         "ref": {
-          "description": "Branch/tag name",
+          "description": "For git sources: the branch, tag, or ref that was checked out",
           "type": "string"
         },
         "commitHash": {
-          "description": "Full commit SHA",
+          "description": "For git sources: the full commit SHA",
           "type": "string"
         },
         "licenses": {
-          "description": "SPDX license identifiers or custom license strings",
+          "description": "SPDX license identifiers or custom license strings for the source content",
           "type": "array",
           "items": {
             "type": "string"
@@ -212,6 +220,5 @@
   },
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://libragen.dev/schemas/v1/library-metadata.schema.json",
-  "title": "Libragen Library Metadata",
-  "description": "Metadata stored inside .libragen files describing the library contents"
+  "title": "Libragen Library Metadata"
 }
