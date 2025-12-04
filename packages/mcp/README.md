@@ -1,6 +1,23 @@
-# @libragen/mcp
+<p align="center">
+  <img src="https://libragen.dev/favicon.svg" alt="Libragen Logo" width="80" height="80">
+</p>
 
-Model Context Protocol (MCP) server for libragen, enabling AI assistants to search code libraries.
+<h1 align="center">@libragen/mcp</h1>
+
+<p align="center">
+  <strong>MCP server for <a href="https://libragen.dev">libragen</a> — stop your AI from hallucinating code</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@libragen/mcp"><img src="https://img.shields.io/npm/v/@libragen/mcp.svg" alt="npm"></a>
+  <a href="https://github.com/libragen/libragen/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
+
+---
+
+Model Context Protocol (MCP) server that enables AI assistants like Claude Desktop, VS Code, and Windsurf to search libragen libraries. Ground your AI in real documentation instead of stale training data.
+
+**[Full documentation →](https://libragen.dev)**
 
 ## Installation
 

@@ -1,6 +1,23 @@
-# @libragen/core
+<p align="center">
+  <img src="https://libragen.dev/favicon.svg" alt="Libragen Logo" width="80" height="80">
+</p>
 
-Core library for building and querying semantic code libraries.
+<h1 align="center">@libragen/core</h1>
+
+<p align="center">
+  <strong>Core library for <a href="https://libragen.dev">libragen</a> — stop your AI from hallucinating code</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@libragen/core"><img src="https://img.shields.io/npm/v/@libragen/core.svg" alt="npm"></a>
+  <a href="https://github.com/libragen/libragen/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
+
+---
+
+This package provides the core functionality for building and querying libragen libraries — private, local RAG libraries that ground your AI in real documentation instead of stale training data.
+
+**[Full documentation →](https://libragen.dev)**
 
 ## Installation
 

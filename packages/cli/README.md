@@ -1,6 +1,23 @@
-# @libragen/cli
+<p align="center">
+  <img src="https://libragen.dev/favicon.svg" alt="Libragen Logo" width="80" height="80">
+</p>
 
-Command-line interface for building and querying libragen libraries.
+<h1 align="center">@libragen/cli</h1>
+
+<p align="center">
+  <strong>Command-line interface for <a href="https://libragen.dev">libragen</a> — stop your AI from hallucinating code</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@libragen/cli"><img src="https://img.shields.io/npm/v/@libragen/cli.svg" alt="npm"></a>
+  <a href="https://github.com/libragen/libragen/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
+
+---
+
+Build and manage libragen libraries from the command line. Create private, local RAG libraries that ground your AI in real documentation instead of stale training data.
+
+**[Full documentation →](https://libragen.dev)**
 
 ## Installation
 
