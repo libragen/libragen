@@ -31,7 +31,8 @@ This automatically detects and configures your AI tool (Claude Desktop, Cursor, 
 
 After installation, restart your AI tool to load the server.
 
-## Manual Configuration
+<details>
+<summary><strong>Manual Configuration</strong></summary>
 
 If you prefer manual setup or need custom options, add this to your tool's MCP configuration:
 
@@ -47,6 +48,8 @@ If you prefer manual setup or need custom options, add this to your tool's MCP c
 ```
 
 See [install-mcp documentation](https://www.npmjs.com/package/install-mcp) for config file locations by tool.
+
+</details>
 
 ## Library Discovery
 
@@ -64,6 +67,40 @@ When used in VS Code, Windsurf, or other IDEs that support MCP roots, the server
 - Libraries installed in `<project>/.libragen/libraries/` are discovered automatically
 - Project libraries shadow global libraries with the same name
 - No configuration needed — just open your project
+
+## Using the Libragen MCP
+
+Once configured, just ask your AI assistant naturally. Here's a typical workflow:
+
+### 1. Build a library from documentation
+
+> "Build a libragen library from https://github.com/expressjs/express/tree/master/docs"
+
+> "Build a libragen library from ./internal-team-docs"
+
+The AI will index the source and create a searchable library. Works with GitHub URLs, local directories, or individual files.
+
+### 2. Search your new library
+
+> "Search my express library for how to set up middleware"
+
+> "How do I handle errors in express?"
+
+> "What's our company's vacation policy? Look in the internal-team-docs library"
+
+Your AI now has accurate, up-to-date information instead of relying on training data.
+
+### 3. Manage your libraries
+
+> "What libragen libraries do I have installed?"
+
+> "Uninstall the express library"
+
+> "Check for updates to my installed libraries"
+
+The AI handles the tool calls automatically — you just describe what you need.
+
+**[See more examples and tips →](https://libragen.dev/mcp/)**
 
 ## Tools
 
