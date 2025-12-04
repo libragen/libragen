@@ -10,6 +10,7 @@ import { LibraryManager, CollectionClient } from '@libragen/core';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as os from 'os';
+import { getLibraryPaths } from '../server.ts';
 
 /**
  * Register the libragen_install tool with the MCP server.
@@ -36,7 +37,9 @@ After installation, use libragen_search to query the installed libraries.`,
 
    server.registerTool('libragen_install', toolConfig, async (params) => {
       const { source, force = false, includeOptional = false } = params,
-            manager = new LibraryManager();
+            // Use discovered library paths from MCP roots
+            paths = getLibraryPaths(),
+            manager = new LibraryManager({ paths });
 
       // Determine source type
       const isCollection = manager.isCollection(source),

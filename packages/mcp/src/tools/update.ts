@@ -11,6 +11,7 @@ import type { InstalledLibrary, CollectionEntry } from '@libragen/core';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as os from 'os';
+import { getLibraryPaths } from '../server.ts';
 
 interface UpdateCandidate {
    name: string;
@@ -70,7 +71,8 @@ async function handleUpdate(
    force: boolean,
    dryRun: boolean
 ): Promise<ToolResponse> {
-   const manager = new LibraryManager(),
+   const paths = getLibraryPaths(),
+         manager = new LibraryManager({ paths }),
          client = new CollectionClient();
 
    await client.loadConfig();

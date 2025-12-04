@@ -7,6 +7,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { LibraryManager } from '@libragen/core';
+import { getLibraryPaths } from '../server.ts';
 
 /**
  * Register the libragen_uninstall tool with the MCP server.
@@ -28,7 +29,8 @@ Use libragen_list first to see installed libraries and their names.`,
    };
 
    server.registerTool('libragen_uninstall', toolConfig, async ({ name }) => {
-      const manager = new LibraryManager();
+      const paths = getLibraryPaths(),
+            manager = new LibraryManager({ paths });
 
       // Find the library first to show what we're removing
       const lib = await manager.find(name);
