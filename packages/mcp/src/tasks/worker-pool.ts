@@ -12,8 +12,9 @@ import type { BuildTask } from './task-manager.ts';
 import { getTaskManager } from './task-manager.ts';
 import type { WorkerOutMessage } from './build-worker.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const currentFilename = fileURLToPath(import.meta.url);
+
+const currentDirname = path.dirname(currentFilename);
 
 /** Map of task ID to worker */
 const workers = new Map<string, Worker>();
@@ -25,12 +26,12 @@ const workers = new Map<string, Worker>();
 function getWorkerPath(): string {
    // In production, use the compiled .js file
    // In development with ts-node or tsx, use the .ts file
-   const jsPath = path.join(__dirname, 'build-worker.js'),
-         tsPath = path.join(__dirname, 'build-worker.ts');
+   const jsPath = path.join(currentDirname, 'build-worker.js'),
+         tsPath = path.join(currentDirname, 'build-worker.ts');
 
    // Check if we're running in a TypeScript environment
    // by checking if the current file is .ts
-   if (__filename.endsWith('.ts')) {
+   if (currentFilename.endsWith('.ts')) {
       return tsPath;
    }
 
@@ -63,22 +64,30 @@ export function startWorker(task: BuildTask): void {
       }
 
       switch (msg.type) {
-         case 'progress':
+         case 'progress': {
             taskManager.updateTask(task.id, {
                progress: msg.progress ?? currentTask.progress,
                currentStep: msg.step ?? currentTask.currentStep,
             });
             break;
+         }
 
-         case 'complete':
+         case 'complete': {
             taskManager.markCompleted(task.id, msg.result ?? 'Build completed');
             cleanupWorker(task.id);
             break;
+         }
 
-         case 'error':
+         case 'error': {
             taskManager.markFailed(task.id, msg.error ?? 'Unknown error');
             cleanupWorker(task.id);
             break;
+         }
+
+         default: {
+            // Unknown message type, ignore
+            break;
+         }
       }
    });
 

@@ -111,6 +111,7 @@ async function executeBuild(params: BuildParams): Promise<void> {
    } = params;
 
    let gitResult: GitSourceResult | undefined;
+
    const gitSource = new GitSource();
 
    try {
@@ -195,15 +196,15 @@ async function executeBuild(params: BuildParams): Promise<void> {
 
       const libraryName = name || (isGit ? deriveGitLibraryName(parseGitUrl(source).repoUrl) : path.basename(sourcePath));
 
-      // Resolve output path - use temp directory for git sources, or resolve relative to source for local
+      // Resolve output path: temp dir for git sources, relative to source for local
       let outputPath: string;
 
       if (output) {
          outputPath = path.resolve(output);
       } else if (isGit) {
          // For git sources without explicit output, use a temp location
-         const os = await import('os');
-         const tempDir = os.tmpdir();
+         const os = await import('os'),
+               tempDir = os.tmpdir();
 
          outputPath = path.join(tempDir, `${libraryName}.libragen`);
       } else {
@@ -327,11 +328,10 @@ async function executeBuild(params: BuildParams): Promise<void> {
             },
             stats: {
                chunkCount: chunks.length,
-               sourceCount: new Set(
-                  chunks.map((c) => {
-                     return c.metadata.sourceFile;
-                  })
-               ).size,
+               sourceCount: new Set(chunks.map((c) => {
+                  return c.metadata.sourceFile;
+               }))
+                  .size,
                fileSize: 0,
             },
             contentHash: `sha256:${contentHash}`,

@@ -15,6 +15,7 @@ import {
    type BuildTask,
 } from '../tasks/index.ts';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface BuildToolConfig {
    // Config options reserved for future use
 }
@@ -41,10 +42,11 @@ function formatTaskResponse(task: BuildTask): {
    let queuePosition: number | undefined;
 
    if (task.status === 'queued') {
-      const allTasks = taskManager.getAllTasks(),
-            queuedTasks = allTasks.filter((t) => {
-               return t.status === 'queued';
-            });
+      const allTasks = taskManager.getAllTasks();
+
+      const queuedTasks = allTasks.filter((t) => {
+         return t.status === 'queued';
+      });
 
       queuePosition = queuedTasks.findIndex((t) => {
          return t.id === task.id;
@@ -167,10 +169,12 @@ The resulting library can be searched with libragen_search to find relevant cont
             // Validate source is provided
             if (!params.source) {
                return {
-                  content: [ {
-                     type: 'text' as const,
-                     text: JSON.stringify({ error: 'source is required for start action' }),
-                  } ],
+                  content: [
+                     {
+                        type: 'text' as const,
+                        text: JSON.stringify({ error: 'source is required for start action' }),
+                     },
+                  ],
                };
             }
 
@@ -206,23 +210,27 @@ The resulting library can be searched with libragen_search to find relevant cont
             const response = formatTaskResponse(task);
 
             return {
-               content: [ {
-                  type: 'text' as const,
-                  text: JSON.stringify({
-                     ...response,
-                     message: 'Build started. Poll with action="status" to check progress.',
-                  }),
-               } ],
+               content: [
+                  {
+                     type: 'text' as const,
+                     text: JSON.stringify({
+                        ...response,
+                        message: 'Build started. Poll with action="status" to check progress.',
+                     }),
+                  },
+               ],
             };
          }
 
          case 'status': {
             if (!taskId) {
                return {
-                  content: [ {
-                     type: 'text' as const,
-                     text: JSON.stringify({ error: 'taskId is required for status action' }),
-                  } ],
+                  content: [
+                     {
+                        type: 'text' as const,
+                        text: JSON.stringify({ error: 'taskId is required for status action' }),
+                     },
+                  ],
                };
             }
 
@@ -230,28 +238,34 @@ The resulting library can be searched with libragen_search to find relevant cont
 
             if (!task) {
                return {
-                  content: [ {
-                     type: 'text' as const,
-                     text: JSON.stringify({ error: 'Task not found', taskId }),
-                  } ],
+                  content: [
+                     {
+                        type: 'text' as const,
+                        text: JSON.stringify({ error: 'Task not found', taskId }),
+                     },
+                  ],
                };
             }
 
             return {
-               content: [ {
-                  type: 'text' as const,
-                  text: JSON.stringify(formatTaskResponse(task)),
-               } ],
+               content: [
+                  {
+                     type: 'text' as const,
+                     text: JSON.stringify(formatTaskResponse(task)),
+                  },
+               ],
             };
          }
 
          case 'cancel': {
             if (!taskId) {
                return {
-                  content: [ {
-                     type: 'text' as const,
-                     text: JSON.stringify({ error: 'taskId is required for cancel action' }),
-                  } ],
+                  content: [
+                     {
+                        type: 'text' as const,
+                        text: JSON.stringify({ error: 'taskId is required for cancel action' }),
+                     },
+                  ],
                };
             }
 
@@ -259,10 +273,12 @@ The resulting library can be searched with libragen_search to find relevant cont
 
             if (!task) {
                return {
-                  content: [ {
-                     type: 'text' as const,
-                     text: JSON.stringify({ error: 'Task not found', taskId }),
-                  } ],
+                  content: [
+                     {
+                        type: 'text' as const,
+                        text: JSON.stringify({ error: 'Task not found', taskId }),
+                     },
+                  ],
                };
             }
 
@@ -274,26 +290,31 @@ The resulting library can be searched with libragen_search to find relevant cont
             const cancelled = taskManager.cancelTask(taskId);
 
             return {
-               content: [ {
-                  type: 'text' as const,
-                  text: JSON.stringify({
-                     success: cancelled,
-                     taskId,
-                     message: cancelled
-                        ? 'Build cancelled'
-                        : 'Task could not be cancelled (may already be completed)',
-                  }),
-               } ],
+               content: [
+                  {
+                     type: 'text' as const,
+                     text: JSON.stringify({
+                        success: cancelled,
+                        taskId,
+                        message: cancelled
+                           ? 'Build cancelled'
+                           : 'Task could not be cancelled (may already be completed)',
+                     }),
+                  },
+               ],
             };
          }
 
-         default:
+         default: {
             return {
-               content: [ {
-                  type: 'text' as const,
-                  text: JSON.stringify({ error: `Unknown action: ${action}` }),
-               } ],
+               content: [
+                  {
+                     type: 'text' as const,
+                     text: JSON.stringify({ error: `Unknown action: ${action}` }),
+                  },
+               ],
             };
+         }
       }
    });
 }

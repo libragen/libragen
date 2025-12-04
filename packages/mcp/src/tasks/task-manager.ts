@@ -64,18 +64,19 @@ const DEFAULT_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
  * Manages build tasks with queuing and concurrency control.
  */
 export class TaskManager {
-   private tasks = new Map<string, BuildTask>();
-   private queue: string[] = []; // Task IDs in queue order
-   private runningCount = 0;
-   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
 
-   readonly maxConcurrent: number;
-   readonly taskExpiryMs: number;
+   public readonly maxConcurrent: number;
+   public readonly taskExpiryMs: number;
 
    /** Callback invoked when a queued task should start */
-   onTaskReady?: (task: BuildTask) => void;
+   public onTaskReady?: (task: BuildTask) => void;
 
-   constructor(config: TaskManagerConfig = {}) {
+   private _tasks = new Map<string, BuildTask>();
+   private _queue: string[] = []; // Task IDs in queue order
+   private _runningCount = 0;
+   private _cleanupInterval: ReturnType<typeof setInterval> | null = null;
+
+   public constructor(config: TaskManagerConfig = {}) {
       // Default to n-1 cores, minimum 1
       const cpuCount = os.cpus().length;
 
@@ -88,20 +89,20 @@ export class TaskManager {
          ?? (envExpiry ? parseInt(envExpiry, 10) : DEFAULT_EXPIRY_MS);
 
       // Start cleanup interval (every 5 minutes)
-      this.cleanupInterval = setInterval(() => {
+      this._cleanupInterval = setInterval(() => {
          this.cleanupExpiredTasks();
       }, 5 * 60 * 1000);
 
       // Don't keep process alive just for cleanup
-      this.cleanupInterval.unref();
+      this._cleanupInterval.unref();
    }
 
    /**
     * Create a new build task and add it to the queue.
     */
-   createTask(
+   public createTask(
       params: BuildParams,
-      sendProgress?: BuildTask['sendProgress'],
+      sendProgress?: BuildTask['sendProgress']
    ): BuildTask {
       const task: BuildTask = {
          id: randomUUID(),
@@ -113,8 +114,8 @@ export class TaskManager {
          sendProgress,
       };
 
-      this.tasks.set(task.id, task);
-      this.queue.push(task.id);
+      this._tasks.set(task.id, task);
+      this._queue.push(task.id);
 
       return task;
    }
@@ -122,15 +123,15 @@ export class TaskManager {
    /**
     * Get a task by ID.
     */
-   getTask(id: string): BuildTask | undefined {
-      return this.tasks.get(id);
+   public getTask(id: string): BuildTask | undefined {
+      return this._tasks.get(id);
    }
 
    /**
     * Update a task's properties.
     */
-   updateTask(id: string, updates: Partial<BuildTask>): void {
-      const task = this.tasks.get(id);
+   public updateTask(id: string, updates: Partial<BuildTask>): void {
+      const task = this._tasks.get(id);
 
       if (task) {
          Object.assign(task, updates);
@@ -149,19 +150,19 @@ export class TaskManager {
    /**
     * Mark a task as started (running).
     */
-   markRunning(id: string): void {
-      const task = this.tasks.get(id);
+   public markRunning(id: string): void {
+      const task = this._tasks.get(id);
 
       if (task && task.status === 'queued') {
          task.status = 'running';
          task.currentStep = 'Starting...';
-         this.runningCount++;
+         this._runningCount += 1;
 
          // Remove from queue
-         const queueIndex = this.queue.indexOf(id);
+         const queueIndex = this._queue.indexOf(id);
 
          if (queueIndex !== -1) {
-            this.queue.splice(queueIndex, 1);
+            this._queue.splice(queueIndex, 1);
          }
       }
    }
@@ -169,8 +170,8 @@ export class TaskManager {
    /**
     * Mark a task as completed with result.
     */
-   markCompleted(id: string, result: string): void {
-      const task = this.tasks.get(id);
+   public markCompleted(id: string, result: string): void {
+      const task = this._tasks.get(id);
 
       if (task && task.status === 'running') {
          task.status = 'completed';
@@ -178,7 +179,7 @@ export class TaskManager {
          task.currentStep = 'Completed';
          task.result = result;
          task.completedAt = new Date();
-         this.runningCount--;
+         this._runningCount -= 1;
          this.processQueue();
       }
    }
@@ -186,8 +187,8 @@ export class TaskManager {
    /**
     * Mark a task as failed with error.
     */
-   markFailed(id: string, error: string): void {
-      const task = this.tasks.get(id);
+   public markFailed(id: string, error: string): void {
+      const task = this._tasks.get(id);
 
       if (task && (task.status === 'running' || task.status === 'queued')) {
          const wasRunning = task.status === 'running';
@@ -198,13 +199,13 @@ export class TaskManager {
          task.completedAt = new Date();
 
          if (wasRunning) {
-            this.runningCount--;
+            this._runningCount -= 1;
          } else {
             // Remove from queue
-            const queueIndex = this.queue.indexOf(id);
+            const queueIndex = this._queue.indexOf(id);
 
             if (queueIndex !== -1) {
-               this.queue.splice(queueIndex, 1);
+               this._queue.splice(queueIndex, 1);
             }
          }
 
@@ -215,8 +216,8 @@ export class TaskManager {
    /**
     * Cancel a task. Returns true if cancelled, false if not found or already completed.
     */
-   cancelTask(id: string): boolean {
-      const task = this.tasks.get(id);
+   public cancelTask(id: string): boolean {
+      const task = this._tasks.get(id);
 
       if (!task) {
          return false;
@@ -233,13 +234,13 @@ export class TaskManager {
       task.completedAt = new Date();
 
       if (wasRunning) {
-         this.runningCount--;
+         this._runningCount -= 1;
       } else {
          // Remove from queue
-         const queueIndex = this.queue.indexOf(id);
+         const queueIndex = this._queue.indexOf(id);
 
          if (queueIndex !== -1) {
-            this.queue.splice(queueIndex, 1);
+            this._queue.splice(queueIndex, 1);
          }
       }
 
@@ -251,30 +252,30 @@ export class TaskManager {
    /**
     * Get the number of currently running tasks.
     */
-   getRunningCount(): number {
-      return this.runningCount;
+   public getRunningCount(): number {
+      return this._runningCount;
    }
 
    /**
     * Get the number of queued tasks.
     */
-   getQueueLength(): number {
-      return this.queue.length;
+   public getQueueLength(): number {
+      return this._queue.length;
    }
 
    /**
     * Check if we can start more tasks and trigger onTaskReady for next queued task.
     */
-   processQueue(): void {
-      while (this.runningCount < this.maxConcurrent && this.queue.length > 0) {
-         const taskId = this.queue[0];
-         const task = this.tasks.get(taskId);
+   public processQueue(): void {
+      while (this._runningCount < this.maxConcurrent && this._queue.length > 0) {
+         const taskId = this._queue[0],
+               task = this._tasks.get(taskId);
 
          if (task && task.status === 'queued' && this.onTaskReady) {
             this.onTaskReady(task);
          } else {
             // Task was removed or invalid, skip it
-            this.queue.shift();
+            this._queue.shift();
          }
 
          // Only process one at a time - onTaskReady should call markRunning
@@ -286,15 +287,15 @@ export class TaskManager {
    /**
     * Remove expired completed/failed/cancelled tasks.
     */
-   cleanupExpiredTasks(): void {
+   public cleanupExpiredTasks(): void {
       const now = Date.now();
 
-      for (const [ id, task ] of this.tasks) {
+      for (const [ id, task ] of this._tasks) {
          if (task.completedAt) {
             const age = now - task.completedAt.getTime();
 
             if (age > this.taskExpiryMs) {
-               this.tasks.delete(id);
+               this._tasks.delete(id);
             }
          }
       }
@@ -303,17 +304,17 @@ export class TaskManager {
    /**
     * Get all tasks (for debugging/monitoring).
     */
-   getAllTasks(): BuildTask[] {
-      return Array.from(this.tasks.values());
+   public getAllTasks(): BuildTask[] {
+      return Array.from(this._tasks.values());
    }
 
    /**
     * Shutdown the task manager.
     */
-   shutdown(): void {
-      if (this.cleanupInterval) {
-         clearInterval(this.cleanupInterval);
-         this.cleanupInterval = null;
+   public shutdown(): void {
+      if (this._cleanupInterval) {
+         clearInterval(this._cleanupInterval);
+         this._cleanupInterval = null;
       }
    }
 }

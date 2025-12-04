@@ -24,8 +24,8 @@ describe('TaskManager', () => {
 
    describe('createTask', () => {
       it('creates a task with queued status', () => {
-         const params: BuildParams = { source: '/test/path' };
-         const task = manager.createTask(params);
+         const params: BuildParams = { source: '/test/path' },
+               task = manager.createTask(params);
 
          expect(task.id).toBeDefined();
          expect(task.status).toBe('queued');
@@ -36,8 +36,8 @@ describe('TaskManager', () => {
       });
 
       it('generates unique task IDs', () => {
-         const task1 = manager.createTask({ source: '/test/1' });
-         const task2 = manager.createTask({ source: '/test/2' });
+         const task1 = manager.createTask({ source: '/test/1' }),
+               task2 = manager.createTask({ source: '/test/2' });
 
          expect(task1.id).not.toBe(task2.id);
       });
@@ -52,8 +52,8 @@ describe('TaskManager', () => {
 
    describe('getTask', () => {
       it('returns task by ID', () => {
-         const created = manager.createTask({ source: '/test' });
-         const retrieved = manager.getTask(created.id);
+         const created = manager.createTask({ source: '/test' }),
+               retrieved = manager.getTask(created.id);
 
          expect(retrieved).toBe(created);
       });
@@ -79,8 +79,8 @@ describe('TaskManager', () => {
       });
 
       it('calls sendProgress callback when progress updates', () => {
-         const sendProgress = vi.fn();
-         const task = manager.createTask({ source: '/test' }, sendProgress);
+         const sendProgress = vi.fn(),
+               task = manager.createTask({ source: '/test' }, sendProgress);
 
          manager.updateTask(task.id, {
             progress: 75,
@@ -238,6 +238,7 @@ describe('TaskManager', () => {
 
       it('processes queue when task completes', () => {
          const startedTasks: string[] = [];
+
          const onTaskReady = vi.fn((task) => {
             startedTasks.push(task.id);
             manager.markRunning(task.id);
@@ -246,8 +247,8 @@ describe('TaskManager', () => {
          manager.onTaskReady = onTaskReady;
 
          const task1 = manager.createTask({ source: '/test/1' });
-         const task2 = manager.createTask({ source: '/test/2' });
 
+         manager.createTask({ source: '/test/2' });
          manager.createTask({ source: '/test/3' });
 
          manager.processQueue();
@@ -310,8 +311,9 @@ describe('TaskManager', () => {
    describe('singleton', () => {
       it('returns same instance', () => {
          resetTaskManager();
-         const instance1 = getTaskManager();
-         const instance2 = getTaskManager();
+
+         const instance1 = getTaskManager(),
+               instance2 = getTaskManager();
 
          expect(instance1).toBe(instance2);
 
