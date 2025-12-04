@@ -39,10 +39,13 @@ console.log(`Chunks: ${result.stats.chunkCount}`);
 import { Embedder, VectorStore, Searcher } from '@libragen/core';
 
 const embedder = new Embedder();
-const store = new VectorStore('./my-library.libragen');
-const searcher = new Searcher(store, embedder);
+await embedder.initialize();
 
-const results = await searcher.search('How do I authenticate?', { topK: 5 });
+const store = new VectorStore('./my-library.libragen');
+store.initialize();
+
+const searcher = new Searcher(embedder, store);
+const results = await searcher.search({ query: 'How do I authenticate?', k: 5 });
 
 for (const result of results) {
   console.log(`[${result.score.toFixed(2)}] ${result.source}`);
@@ -122,15 +125,17 @@ interface BuildResult {
 
 ### `Embedder`
 
-Generates vector embeddings from text using a local transformer model.
+Generates vector embeddings from text using a local transformer model. Implements the `IEmbedder` interface.
 
 ```typescript
 import { Embedder } from '@libragen/core';
 
 const embedder = new Embedder({
   model: 'Xenova/bge-small-en-v1.5', // default
-  dtype: 'q8', // quantized for speed
+  quantization: 'q8', // quantized for speed
 });
+
+await embedder.initialize();
 
 // Generate embedding for a single text
 const embedding = await embedder.embed('Hello world');
@@ -142,6 +147,9 @@ const embeddings = await embedder.embedBatch([
   'Second document',
 ]);
 // Returns: Float32Array(384)[]
+
+// Clean up when done
+await embedder.dispose();
 ```
 
 #### Constructor Options
@@ -149,7 +157,61 @@ const embeddings = await embedder.embedBatch([
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `model` | string | `Xenova/bge-small-en-v1.5` | HuggingFace model ID |
-| `dtype` | `'fp32' \| 'fp16' \| 'q8' \| 'q4'` | `'q8'` | Model precision |
+| `quantization` | `'fp32' \| 'fp16' \| 'q8' \| 'q4'` | `'q8'` | Model precision |
+
+---
+
+### `IEmbedder` Interface
+
+Interface for custom embedding implementations. Use this to integrate external embedding services like OpenAI, Cohere, or other providers.
+
+```typescript
+import type { IEmbedder } from '@libragen/core';
+
+class OpenAIEmbedder implements IEmbedder {
+  dimensions = 1536; // text-embedding-3-small
+
+  async initialize() {
+    // Setup OpenAI client
+  }
+
+  async embed(text: string): Promise<Float32Array> {
+    const response = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: text,
+    });
+    return new Float32Array(response.data[0].embedding);
+  }
+
+  async embedBatch(texts: string[]): Promise<Float32Array[]> {
+    const response = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: texts,
+    });
+    return response.data.map(d => new Float32Array(d.embedding));
+  }
+
+  async dispose() {
+    // Cleanup if needed
+  }
+}
+
+// Use with Builder
+const builder = new Builder({ embedder: new OpenAIEmbedder() });
+
+// Use with Searcher
+const searcher = new Searcher(new OpenAIEmbedder(), store);
+```
+
+#### Interface Methods
+
+| Method | Description |
+|--------|-------------|
+| `dimensions` | The dimensionality of embedding vectors (readonly) |
+| `initialize()` | Initialize the embedder (called before embedding) |
+| `embed(text)` | Embed a single text string |
+| `embedBatch(texts)` | Embed multiple texts |
+| `dispose()` | Clean up resources |
 
 ---
 
@@ -216,10 +278,11 @@ Hybrid search combining vector similarity and full-text search.
 ```typescript
 import { Searcher } from '@libragen/core';
 
-const searcher = new Searcher(store, embedder);
+const searcher = new Searcher(embedder, store);
 
-const results = await searcher.search('authentication methods', {
-  topK: 10,
+const results = await searcher.search({
+  query: 'authentication methods',
+  k: 10,
   contentVersion: '2.0.0', // optional filter
 });
 
@@ -236,10 +299,11 @@ for (const result of results) {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `topK` | number | `10` | Number of results |
+| `query` | string | — | Search query text (required) |
+| `k` | number | `10` | Number of results |
+| `hybridAlpha` | number | `0.5` | Balance between vector (1) and keyword (0) search |
+| `rerank` | boolean | `false` | Apply reranking for better results |
 | `contentVersion` | string | — | Filter by version |
-| `vectorWeight` | number | `0.5` | Weight for vector search (0-1) |
-| `ftsWeight` | number | `0.5` | Weight for full-text search (0-1) |
 
 ---
 

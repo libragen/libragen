@@ -226,7 +226,27 @@ await builder.build('./docs', { name: 'my-docs' }, (progress) => {
 });
 ```
 
-See the [API Reference](/docs/api) for complete documentation.
+### Custom Embedders
+
+Use a custom embedding provider by implementing the `IEmbedder` interface:
+
+```typescript
+import { Builder } from '@libragen/core';
+import type { IEmbedder } from '@libragen/core';
+
+class OpenAIEmbedder implements IEmbedder {
+  dimensions = 1536;
+  async initialize() { /* setup */ }
+  async embed(text: string) { /* call OpenAI */ }
+  async embedBatch(texts: string[]) { /* batch call */ }
+  async dispose() { /* cleanup */ }
+}
+
+const builder = new Builder({ embedder: new OpenAIEmbedder() });
+const result = await builder.build('./docs', { name: 'my-docs' });
+```
+
+See the [API Reference](/docs/api#iembedder-interface) for the full interface specification.
 
 ## Need Help?
 
