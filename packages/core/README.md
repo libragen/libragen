@@ -10,33 +10,41 @@ npm install @libragen/core
 
 ## Quick Start
 
-```typescript
-import {
-   Embedder,
-   Chunker,
-   VectorStore,
-   Searcher,
-   Library,
-} from '@libragen/core';
+### Building a Library
 
-// Create a library
-const library = await Library.create('./my-library.libragen', {
+The simplest way to build a library is using the `Builder` class:
+
+```typescript
+import { Builder } from '@libragen/core';
+
+const builder = new Builder();
+
+// Build from a local directory
+const result = await builder.build('./my-docs', {
    name: 'my-library',
    version: '1.0.0',
-   description: 'My code library',
+   description: 'My documentation library',
 });
 
-// Add content
-const chunker = new Chunker();
-const chunks = await chunker.chunkFile('./src/index.ts');
+console.log(`Built library at ${result.outputPath}`);
+console.log(`Chunks: ${result.stats.chunkCount}`);
+
+// Build from a git repository
+const gitResult = await builder.build('https://github.com/user/repo', {
+   name: 'repo-docs',
+   gitRef: 'main',
+   include: ['docs/**/*.md'],
+});
+```
+
+### Querying a Library
+
+```typescript
+import { Embedder, VectorStore, Searcher } from '@libragen/core';
 
 const embedder = new Embedder();
 await embedder.initialize();
 
-await library.addChunks(chunks, embedder);
-await library.finalize();
-
-// Query the library
 const store = new VectorStore('./my-library.libragen');
 store.initialize();
 
@@ -44,9 +52,82 @@ const searcher = new Searcher(embedder, store);
 const results = await searcher.search({ query: 'authentication' });
 
 console.log(results);
+
+await embedder.dispose();
+store.close();
 ```
 
 ## API Reference
+
+### Builder
+
+High-level API for building `.libragen` libraries from source files or git repositories.
+
+```typescript
+import { Builder } from '@libragen/core';
+
+const builder = new Builder();
+
+// Build from local source
+const result = await builder.build('./src', {
+   name: 'my-library',
+   version: '1.0.0',
+   description: 'My library description',
+   agentDescription: 'Use this library when...',
+   exampleQueries: ['how to authenticate', 'error handling'],
+   keywords: ['typescript', 'api'],
+   programmingLanguages: ['typescript'],
+   chunkSize: 1000,
+   chunkOverlap: 100,
+   include: ['**/*.ts', '**/*.md'],
+   exclude: ['**/test/**'],
+});
+
+console.log(result.outputPath);           // Absolute path to .libragen file
+console.log(result.stats.chunkCount);     // Number of chunks created
+console.log(result.stats.sourceCount);    // Number of source files
+console.log(result.stats.embedDuration);  // Embedding time in seconds
+
+// Build from git with progress callback
+const gitResult = await builder.build('https://github.com/user/repo', {
+   gitRef: 'v2.0.0',
+   gitRepoAuthToken: process.env.GITHUB_TOKEN,
+   license: ['MIT'],
+}, (progress) => {
+   console.log(`${progress.phase}: ${progress.message} (${progress.progress}%)`);
+});
+
+if (gitResult.git) {
+   console.log(gitResult.git.commitHash);
+   console.log(gitResult.git.detectedLicense);
+}
+```
+
+**Build options:**
+
+```typescript
+interface BuildOptions {
+   output?: string;              // Output path for .libragen file
+   name?: string;                // Library name
+   version?: string;             // Library version (default: '0.1.0')
+   contentVersion?: string;      // Source content version
+   description?: string;         // Short description
+   agentDescription?: string;    // AI agent guidance
+   exampleQueries?: string[];    // Example queries
+   keywords?: string[];          // Searchable tags
+   programmingLanguages?: string[];
+   textLanguages?: string[];     // ISO 639-1 codes
+   frameworks?: string[];
+   chunkSize?: number;           // Target chunk size (default: 1000)
+   chunkOverlap?: number;        // Chunk overlap (default: 100)
+   include?: string[];           // Glob patterns to include
+   exclude?: string[];           // Glob patterns to exclude
+   noDefaultExcludes?: boolean;  // Disable default exclusions
+   gitRef?: string;              // Git branch/tag/commit
+   gitRepoAuthToken?: string;    // Auth token for private repos
+   license?: string[];           // SPDX license identifiers
+}
+```
 
 ### Embedder
 
@@ -460,12 +541,72 @@ try {
 console.log(CURRENT_SCHEMA_VERSION);  // e.g., 2
 ```
 
+### Update Checking
+
+Utilities for checking and applying library updates from collections.
+
+```typescript
+import {
+   LibraryManager,
+   CollectionClient,
+   checkForUpdate,
+   findUpdates,
+   performUpdate,
+} from '@libragen/core';
+
+const manager = new LibraryManager();
+const client = new CollectionClient();
+await client.loadConfig();
+
+// Get installed libraries
+const installed = await manager.listInstalled();
+
+// Find all available updates
+const updates = await findUpdates(installed, client, { force: false });
+
+for (const update of updates) {
+   console.log(`${update.name}: ${update.currentVersion} → ${update.newVersion}`);
+
+   // Apply the update
+   await performUpdate(update, manager);
+}
+
+// Or check a single library
+const lib = await manager.find('my-library');
+const entry = await client.getEntry('my-library');
+
+if (lib && entry) {
+   const update = checkForUpdate(lib, entry);
+   if (update) {
+      await performUpdate(update, manager);
+   }
+}
+```
+
+**Types:**
+
+```typescript
+interface UpdateCandidate {
+   name: string;
+   currentVersion: string;
+   currentContentVersion?: string;
+   newVersion: string;
+   newContentVersion?: string;
+   source: string;  // Download URL
+   location?: 'global' | 'project';
+}
+
+interface CheckUpdateOptions {
+   force?: boolean;  // Update even if versions match
+}
+```
+
 ### Utilities
 
 Helper functions for common operations.
 
 ```typescript
-import { formatBytes, deriveGitLibraryName } from '@libragen/core';
+import { formatBytes, deriveGitLibraryName, formatDuration } from '@libragen/core';
 
 // Format bytes into human-readable string
 formatBytes(1536);      // "1.5 KB"
@@ -475,6 +616,11 @@ formatBytes(0);         // "0 Bytes"
 // Derive library name from git URL
 deriveGitLibraryName('https://github.com/vercel/next.js.git');  // "vercel-next.js"
 deriveGitLibraryName('https://github.com/microsoft/typescript'); // "microsoft-typescript"
+
+// Format duration in seconds
+formatDuration(45.5);   // "45.5s"
+formatDuration(90);     // "1m 30s"
+formatDuration(120);    // "2m"
 ```
 
 ### Time Estimation

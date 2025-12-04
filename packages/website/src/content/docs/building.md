@@ -182,6 +182,52 @@ For very large doc sets (>10,000 files):
 3. **Use consistent terminology** - Same terms across related docs
 4. **Include examples** - Code examples improve retrieval for technical queries
 
+## Programmatic Building
+
+Use the `Builder` class from `@libragen/core` to build libraries programmatically:
+
+```typescript
+import { Builder } from '@libragen/core';
+
+const builder = new Builder();
+
+const result = await builder.build('./docs', {
+  name: 'my-docs',
+  version: '1.0.0',
+  description: 'My documentation',
+  chunkSize: 1000,
+  chunkOverlap: 100,
+});
+
+console.log(`Built: ${result.outputPath}`);
+console.log(`Chunks: ${result.stats.chunkCount}`);
+console.log(`Time: ${result.stats.embedDuration}s`);
+```
+
+Build from git repositories:
+
+```typescript
+const result = await builder.build('https://github.com/user/repo', {
+  gitRef: 'v2.0.0',
+  include: ['docs/**/*.md'],
+});
+
+if (result.git) {
+  console.log(`Commit: ${result.git.commitHash}`);
+  console.log(`License: ${result.git.detectedLicense?.identifier}`);
+}
+```
+
+Track progress during builds:
+
+```typescript
+await builder.build('./docs', { name: 'my-docs' }, (progress) => {
+  console.log(`[${progress.progress}%] ${progress.phase}: ${progress.message}`);
+});
+```
+
+See the [API Reference](/docs/api) for complete documentation.
+
 ## Need Help?
 
 See the [Troubleshooting guide](/docs/troubleshooting) for solutions to common build issues like slow builds, memory errors, and poor search results.

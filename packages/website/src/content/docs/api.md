@@ -15,17 +15,33 @@ npm install --save-exact @libragen/core
 
 ## Quick Example
 
+### Building a Library
+
+```typescript
+import { Builder } from '@libragen/core';
+
+const builder = new Builder();
+
+// Build from local directory
+const result = await builder.build('./docs', {
+  name: 'my-docs',
+  version: '1.0.0',
+  description: 'My documentation library',
+});
+
+console.log(`Built: ${result.outputPath}`);
+console.log(`Chunks: ${result.stats.chunkCount}`);
+```
+
+### Searching a Library
+
 ```typescript
 import { Embedder, VectorStore, Searcher } from '@libragen/core';
 
-// Create an embedder
 const embedder = new Embedder();
-
-// Open a library
 const store = new VectorStore('./my-library.libragen');
-
-// Search
 const searcher = new Searcher(store, embedder);
+
 const results = await searcher.search('How do I authenticate?', { topK: 5 });
 
 for (const result of results) {
@@ -35,6 +51,74 @@ for (const result of results) {
 ```
 
 ## Classes
+
+### `Builder`
+
+High-level API for building `.libragen` libraries from source files or git repositories.
+
+```typescript
+import { Builder } from '@libragen/core';
+
+const builder = new Builder();
+
+// Build from local source
+const result = await builder.build('./src', {
+  name: 'my-library',
+  version: '1.0.0',
+  description: 'My library',
+  chunkSize: 1000,
+  chunkOverlap: 100,
+});
+
+// Build from git repository
+const gitResult = await builder.build('https://github.com/user/repo', {
+  gitRef: 'main',
+  include: ['docs/**/*.md'],
+});
+
+// With progress callback
+await builder.build('./docs', { name: 'my-docs' }, (progress) => {
+  console.log(`${progress.phase}: ${progress.message}`);
+});
+```
+
+#### Build Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `output` | string | — | Output path for .libragen file |
+| `name` | string | — | Library name |
+| `version` | string | `'0.1.0'` | Library version |
+| `description` | string | — | Short description |
+| `chunkSize` | number | `1000` | Target chunk size in characters |
+| `chunkOverlap` | number | `100` | Overlap between chunks |
+| `include` | string[] | — | Glob patterns to include |
+| `exclude` | string[] | — | Glob patterns to exclude |
+| `gitRef` | string | — | Git branch/tag/commit |
+| `license` | string[] | — | SPDX license identifiers |
+
+#### Build Result
+
+```typescript
+interface BuildResult {
+  outputPath: string;      // Absolute path to .libragen file
+  metadata: LibraryMetadata;
+  stats: {
+    chunkCount: number;
+    sourceCount: number;
+    fileSize: number;
+    embedDuration: number;
+    chunksPerSecond: number;
+  };
+  git?: {
+    commitHash: string;
+    ref: string;
+    detectedLicense?: { identifier: string; confidence: string };
+  };
+}
+```
+
+---
 
 ### `Embedder`
 

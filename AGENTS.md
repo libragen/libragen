@@ -138,6 +138,99 @@ npm run build
 npx tsc --build
 ```
 
+## Core Design Principles
+
+### Core as the Single Source of Truth
+
+**CRITICAL:** All business logic shared between CLI and MCP MUST live in `@libragen/core`.
+
+The package hierarchy is:
+```
+@libragen/core   ← Contains ALL reusable logic
+    ↑
+    ├── @libragen/cli   ← Thin wrapper: UI, argument parsing, formatting
+    └── @libragen/mcp   ← Thin wrapper: MCP protocol, async task management
+```
+
+**What belongs in core:**
+- Building libraries (`Builder` class)
+- Library management (`LibraryManager`)
+- Searching and querying (`Searcher`, `Embedder`)
+- Update checking (`checkForUpdate`, `findUpdates`)
+- Collection resolution
+- All data types and interfaces
+- Utility functions (`formatBytes`, `formatDuration`, etc.)
+
+**What belongs in CLI/MCP:**
+- User interface concerns (chalk, ora, interactive prompts)
+- Protocol-specific code (MCP SDK, commander.js)
+- Async execution patterns (worker threads in MCP)
+- Output formatting for specific contexts
+
+### Avoiding Duplication
+
+Before implementing logic in CLI or MCP, ask:
+1. Does this logic already exist in core?
+2. Could another consumer (CLI or MCP) benefit from this logic?
+3. Is this pure business logic or UI/protocol-specific?
+
+If the logic is reusable, it MUST go in core. CLI and MCP should be thin wrappers that:
+- Parse inputs (arguments, MCP tool params)
+- Call core functions
+- Format outputs for their context
+
+**Anti-pattern (DO NOT DO THIS):**
+```typescript
+// packages/cli/src/commands/build.ts
+// 300 lines of build logic...
+
+// packages/mcp/src/tasks/build-worker.ts
+// 300 lines of nearly identical build logic...
+```
+
+**Correct pattern:**
+```typescript
+// packages/core/src/builder.ts
+export class Builder {
+  async build(source: string, options: BuildOptions): Promise<BuildResult> {
+    // All build logic here
+  }
+}
+
+// packages/cli/src/commands/build.ts
+const builder = new Builder();
+const result = await builder.build(source, options);
+// Format and display result with chalk/ora
+
+// packages/mcp/src/tasks/build-worker.ts
+const builder = new Builder();
+const result = await builder.build(source, options);
+// Send result via worker message
+```
+
+### Core Module Organization
+
+Core exports are organized by domain:
+
+```typescript
+// Building
+export { Builder } from './builder.ts';
+export type { BuildOptions, BuildResult, BuildProgress } from './builder.ts';
+
+// Library Management
+export { LibraryManager } from './manager.ts';
+export type { InstalledLibrary, InstallOptions } from './manager.ts';
+
+// Searching
+export { Searcher, Embedder, Reranker } from './...';
+
+// Update Checking
+export { checkForUpdate, findUpdates } from './update-checker.ts';
+
+// Utilities
+export { formatBytes, formatDuration, deriveGitLibraryName } from './utils.ts';
+```
+
 ## Common Patterns
 
 ### Adding a New Option to CLI Commands
@@ -167,6 +260,23 @@ npx tsc --build
 4. Update MCP tools that read metadata
 5. Update website schema docs at `packages/website/src/content/docs/schemas.md`
 
+### Adding New Functionality to Both CLI and MCP
+
+1. **First, implement in core:**
+   - Create the class/function in `packages/core/src/`
+   - Export from `packages/core/src/index.ts`
+   - Add tests in `packages/core/src/__tests__/`
+   - Add JSDoc documentation
+2. **Then, create CLI wrapper:**
+   - Import from `@libragen/core`
+   - Add command in `packages/cli/src/commands/`
+   - Handle argument parsing and output formatting only
+3. **Then, create MCP wrapper:**
+   - Import from `@libragen/core`
+   - Add tool in `packages/mcp/src/tools/`
+   - Handle MCP protocol concerns only
+4. **Update documentation** for all three packages
+
 ## Code Style
 
 - Use TypeScript strict mode
@@ -195,3 +305,5 @@ Follow conventional commits:
 6. **Creating ad-hoc test scripts** - Use the existing test infrastructure
 7. **Using scoped commits** - Use conventional commits but do not scope them
 8. **Linting errors** - Run `npm run standards` as a final check before finishing a task
+9. **Duplicating logic between CLI and MCP** - If logic could be shared, it belongs in core. See "Core Design Principles" above
+10. **Implementing business logic in CLI/MCP** - CLI and MCP should be thin wrappers around core functionality

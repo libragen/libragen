@@ -7,42 +7,54 @@
 
 export const VERSION = '0.1.0';
 
-// Embedder
+// ============================================================================
+// Building
+// ============================================================================
+
+export { Builder } from './builder.ts';
+export type {
+   BuildOptions,
+   BuildResult,
+   BuildPhase,
+   BuildProgress,
+   BuildProgressCallback,
+   BuilderConfig,
+} from './builder.ts';
+
+// ============================================================================
+// Embedding & Chunking
+// ============================================================================
+
 export { Embedder } from './embedder.ts';
 export type { EmbedderConfig, EmbedProgress, ProgressCallback, ModelLoadCallback } from './embedder.ts';
 
-// Chunker
 export { Chunker } from './chunker.ts';
 export type { Chunk, ChunkMetadata, ChunkerConfig } from './chunker.ts';
 
-// Vector Store
+// ============================================================================
+// Vector Store & Search
+// ============================================================================
+
 export { VectorStore } from './store.ts';
 export type { StoredChunk, SearchResult, VectorStoreConfig } from './store.ts';
 
-// Searcher
 export { Searcher } from './searcher.ts';
 export type { SearchOptions, SearcherConfig, SearchResultWithContext } from './searcher.ts';
 
-// Reranker
 export { Reranker } from './reranker.ts';
 export type { RerankerConfig, RerankResult, RerankProgress, RerankProgressCallback } from './reranker.ts';
 
+// ============================================================================
 // Library
+// ============================================================================
+
 export { Library } from './library.ts';
 export type { ValidationResult, LibraryCreateOptions, LibraryOpenOptions } from './library.ts';
 
-// Configuration
-export {
-   getLibragenHome,
-   getDefaultLibraryDir,
-   getDefaultManifestDir,
-   getDefaultCollectionConfigDir,
-   getModelCacheDir,
-   detectProjectLibraryDir,
-   hasProjectLibraryDir,
-} from './config.ts';
+// ============================================================================
+// Library Management
+// ============================================================================
 
-// Library Manager
 export { LibraryManager } from './manager.ts';
 export type {
    LibraryLocation,
@@ -54,7 +66,31 @@ export type {
    CollectionInstallResult,
 } from './manager.ts';
 
-// Collection (legacy - for fetching from remote indexes)
+// ============================================================================
+// Update Checking
+// ============================================================================
+
+export { checkForUpdate, findUpdates, performUpdate } from './update-checker.ts';
+export type { UpdateCandidate, CheckUpdateOptions } from './update-checker.ts';
+
+// ============================================================================
+// Configuration
+// ============================================================================
+
+export {
+   getLibragenHome,
+   getDefaultLibraryDir,
+   getDefaultManifestDir,
+   getDefaultCollectionConfigDir,
+   getModelCacheDir,
+   detectProjectLibraryDir,
+   hasProjectLibraryDir,
+} from './config.ts';
+
+// ============================================================================
+// Collections
+// ============================================================================
+
 export { CollectionClient } from './collection.ts';
 export type {
    Collection,
@@ -66,7 +102,6 @@ export type {
    DownloadProgress,
 } from './collection.ts';
 
-// Manifest (tracks installed libraries and collections with reference counting)
 export { Manifest } from './manifest.ts';
 export type {
    CollectionDefinition,
@@ -77,7 +112,6 @@ export type {
    ManifestData,
 } from './manifest.ts';
 
-// Collection Resolver (resolves nested collections and deduplicates libraries)
 export {
    resolveCollection,
    fetchCollectionDefinition,
@@ -87,7 +121,10 @@ export {
 } from './collection-resolver.ts';
 export type { ResolveOptions, ResolveResult } from './collection-resolver.ts';
 
+// ============================================================================
 // Sources
+// ============================================================================
+
 export { FileSource, GitSource, LicenseDetector, detectGitProvider, getAuthToken, isGitUrl, parseGitUrl } from './sources/index.ts';
 export type {
    SourceFile,
@@ -100,7 +137,10 @@ export type {
    DetectedLicense,
 } from './sources/index.ts';
 
+// ============================================================================
 // Migrations
+// ============================================================================
+
 export {
    MigrationRunner,
    MigrationRequiredError,
@@ -110,12 +150,17 @@ export {
 } from './migrations/index.ts';
 export type { Migration, MigrationResult, MigrateOptions } from './migrations/index.ts';
 
+// ============================================================================
 // Types
+// ============================================================================
+
 export type { LibraryMetadata, SourceProvenance } from './types.ts';
 
-// Utils
-export { formatBytes, deriveGitLibraryName } from './utils.ts';
+// ============================================================================
+// Utilities
+// ============================================================================
 
-// Time estimation
+export { formatBytes, deriveGitLibraryName, formatDuration } from './utils.ts';
+
 export { getSystemInfo, estimateEmbeddingTime, formatSystemInfo } from './time-estimate.ts';
 export type { SystemInfo, TimeEstimate } from './time-estimate.ts';

@@ -41,3 +41,25 @@ export function deriveGitLibraryName(repoUrl: string): string {
 
    return org ? `${org}-${repo}` : repo;
 }
+
+/**
+ * Format seconds into a human-readable duration string.
+ *
+ * @param seconds - Duration in seconds
+ * @returns Formatted string (e.g., "1m 30s", "45.2s")
+ *
+ * @example
+ * formatDuration(45.5) // → "45.5s"
+ * formatDuration(90) // → "1m 30s"
+ * formatDuration(120) // → "2m"
+ */
+export function formatDuration(seconds: number): string {
+   if (seconds < 60) {
+      return `${seconds.toFixed(1)}s`;
+   }
+
+   const minutes = Math.floor(seconds / 60),
+         remainingSeconds = Math.round(seconds % 60);
+
+   return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+}

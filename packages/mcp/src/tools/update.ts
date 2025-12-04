@@ -6,21 +6,14 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { LibraryManager, CollectionClient, Library } from '@libragen/core';
-import type { InstalledLibrary, CollectionEntry } from '@libragen/core';
-import * as path from 'path';
-import * as fs from 'fs/promises';
-import * as os from 'os';
+import {
+   LibraryManager,
+   CollectionClient,
+   findUpdates,
+   performUpdate,
+} from '@libragen/core';
+import type { UpdateCandidate } from '@libragen/core';
 import { getLibraryPaths } from '../server.ts';
-
-interface UpdateCandidate {
-   name: string;
-   currentVersion: string;
-   currentContentVersion?: string;
-   newVersion: string;
-   newContentVersion?: string;
-   source: string;
-}
 
 /**
  * Register the libragen_update tool with the MCP server.
@@ -96,7 +89,7 @@ async function handleUpdate(
    }
 
    // Check for updates
-   const updates = await findUpdates(toCheck, client, force);
+   const updates = await findUpdates(toCheck, client, { force });
 
    if (updates.length === 0) {
       return { content: [ { type: 'text' as const, text: '✓ All libraries are up to date.' } ] };
@@ -168,77 +161,4 @@ async function applyUpdates(updates: UpdateCandidate[], manager: LibraryManager)
    }
 
    return lines;
-}
-
-async function findUpdates(
-   toCheck: InstalledLibrary[],
-   client: CollectionClient,
-   force: boolean
-): Promise<UpdateCandidate[]> {
-   const updates: UpdateCandidate[] = [];
-
-   for (const lib of toCheck) {
-      const entry = await client.getEntry(lib.name);
-
-      if (!entry) {
-         continue;
-      }
-
-      const candidate = checkForUpdate(lib, entry, force);
-
-      if (candidate) {
-         updates.push(candidate);
-      }
-   }
-
-   return updates;
-}
-
-function checkForUpdate(
-   lib: InstalledLibrary,
-   entry: CollectionEntry,
-   force: boolean
-): UpdateCandidate | null {
-   const hasNewerVersion = entry.version !== lib.version,
-         hasNewerContent = entry.contentVersion && entry.contentVersion !== lib.contentVersion;
-
-   if (hasNewerVersion || hasNewerContent || force) {
-      return {
-         name: lib.name,
-         currentVersion: lib.version,
-         currentContentVersion: lib.contentVersion,
-         newVersion: entry.version,
-         newContentVersion: entry.contentVersion,
-         source: entry.downloadURL,
-      };
-   }
-
-   return null;
-}
-
-async function performUpdate(
-   update: UpdateCandidate,
-   manager: LibraryManager
-): Promise<void> {
-   const response = await fetch(update.source);
-
-   if (!response.ok) {
-      throw new Error(`Failed to download: ${response.status}`);
-   }
-
-   const tempPath = path.join(os.tmpdir(), `libragen-update-${Date.now()}.libragen`);
-
-   const buffer = await response.arrayBuffer();
-
-   await fs.writeFile(tempPath, Buffer.from(buffer));
-
-   // Verify the downloaded library
-   const newLib = await Library.open(tempPath);
-
-   newLib.close();
-
-   // Install with force to overwrite
-   await manager.install(tempPath, { force: true });
-
-   await fs.unlink(tempPath);
 }
