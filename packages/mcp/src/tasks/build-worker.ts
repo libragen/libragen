@@ -193,8 +193,30 @@ async function executeBuild(params: BuildParams): Promise<void> {
          };
       }
 
-      const libraryName = name || (isGit ? deriveGitLibraryName(parseGitUrl(source).repoUrl) : path.basename(sourcePath)),
-            outputPath = output || `${libraryName}.libragen`;
+      const libraryName = name || (isGit ? deriveGitLibraryName(parseGitUrl(source).repoUrl) : path.basename(sourcePath));
+
+      // Resolve output path - use temp directory for git sources, or resolve relative to source for local
+      let outputPath: string;
+
+      if (output) {
+         outputPath = path.resolve(output);
+      } else if (isGit) {
+         // For git sources without explicit output, use a temp location
+         const os = await import('os');
+         const tempDir = os.tmpdir();
+
+         outputPath = path.join(tempDir, `${libraryName}.libragen`);
+      } else {
+         // For local sources, put output next to the source
+         const sourceDir = path.dirname(sourcePath);
+
+         outputPath = path.join(sourceDir, `${libraryName}.libragen`);
+      }
+
+      // Ensure parent directory exists
+      const outputDir = path.dirname(outputPath);
+
+      await fs.mkdir(outputDir, { recursive: true });
 
       sendProgress('Loading embedding model...', 20);
       checkCancelled();
