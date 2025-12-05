@@ -73,8 +73,8 @@ After installation, use libragen_search to query the installed libraries.`,
             return await installRemoteLibrary(manager, source, force);
          }
 
-         // Legacy: search in configured collections by name
-         return await installFromLegacyCollection(manager, source, force);
+         // Search in configured collections by name
+         return await installFromCollection(manager, source, force);
       } catch(error) {
          return {
             content: [
@@ -187,7 +187,7 @@ async function installCollection(
    };
 }
 
-async function installFromLegacyCollection(
+async function installFromCollection(
    manager: LibraryManager,
    source: string,
    force: boolean

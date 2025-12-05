@@ -61,8 +61,8 @@ export const installCommand = new Command('install')
             // Install from remote library URL
             await installRemoteLibrary(manager, source, options, spinner);
          } else {
-            // Legacy: search in configured collections by name
-            await installFromLegacyCollection(source, options, spinner, manager);
+            // Search in configured collections by name
+            await installFromCollection(source, options, spinner, manager);
          }
 
          console.log('');
@@ -209,13 +209,13 @@ async function installCollection(
    }
 }
 
-async function installFromLegacyCollection(
+async function installFromCollection(
    source: string,
    options: InstallOptions,
    spinner: ReturnType<typeof ora>,
    manager: LibraryManager
 ): Promise<void> {
-   // Legacy: search in configured collections by name
+   // Search in configured collections by name
    spinner.start('Searching collections...');
 
    const client = new CollectionClient();
