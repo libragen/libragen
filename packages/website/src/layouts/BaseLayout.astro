@@ -1,6 +1,7 @@
 ---
 import { Schema } from 'astro-seo-schema';
 import { Seo } from 'astro-seo-meta';
+import { SpeedInsights } from '../components/SpeedInsights';
 
 interface Props {
    title: string;
@@ -122,6 +123,9 @@ const imageURL = new URL(image, Astro.site);
       <title>{title}</title>
    </head>
    <body class="min-h-screen">
+      <!-- Vercel Speed Insights -->
+      <SpeedInsights client:load />
+      
       <!-- Skip to content link for accessibility -->
       <a
          href="#main-content"
