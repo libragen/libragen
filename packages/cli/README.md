@@ -31,6 +31,45 @@ Or use with npx:
 npx @libragen/cli <command>
 ```
 
+## Using the CLI
+
+Here's a typical workflow to get started:
+
+### 1. Build a library from documentation
+
+```bash
+# From a GitHub repository
+libragen build https://github.com/expressjs/express/tree/master/docs -o express.libragen
+
+# From local files
+libragen build ./internal-team-docs -o team-docs.libragen
+```
+
+### 2. Install and search your library
+
+```bash
+# Install to make it available globally
+libragen install express.libragen
+
+# Search with natural language
+libragen query "how to set up middleware" -l express
+```
+
+### 3. Manage your libraries
+
+```bash
+# See what's installed
+libragen list
+
+# Remove a library
+libragen uninstall express
+
+# Check for updates
+libragen update --dry-run
+```
+
+**[See more examples and tips →](https://libragen.dev/cli/)**
+
 ## Commands
 
 ### `build` (alias: `b`)
