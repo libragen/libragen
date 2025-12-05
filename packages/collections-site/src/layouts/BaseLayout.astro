@@ -1,4 +1,6 @@
 ---
+import { SpeedInsights } from '../components/SpeedInsights';
+
 interface Props {
    title: string;
    description?: string;
@@ -59,6 +61,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <title>{title}</title>
    </head>
    <body class="min-h-screen">
+      <!-- Vercel Speed Insights -->
+      <SpeedInsights client:load />
+      
       <a
          href="#main-content"
          class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-indigo-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none"
