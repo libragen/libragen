@@ -1,5 +1,37 @@
 # @libragen/mcp
 
+## 0.2.1
+
+### Patch Changes
+
+- [`7060aad`](https://github.com/libragen/libragen/commit/7060aad2856555c814102d6404753d717bc077da) Thanks [@yokuze](https://github.com/yokuze)! - **Performance Improvements:**
+
+  - Refactor time estimation with config objects for better maintainability
+  - Implement lazy embedder initialization with background warming for faster startup
+
+  **Features:**
+
+  - Upgrade Commander.js to v14 with enhanced TypeScript support, providing better type inference and developer experience
+
+  **Fixes:**
+
+  - Make VERSION constant dynamically read from package.json instead of being hardcoded
+
+  **Refactoring:**
+
+  - Remove legacy markings from collection search functionality
+  - Remove legacy marking from collection install option
+
+  **Documentation:**
+
+  - Update CLI usage examples and workflow in README
+  - Add quick setup and usage examples to MCP README
+  - Fix CLI install command syntax in marketing copy
+  - Update collections description to focus on team use case
+
+- Updated dependencies [[`7060aad`](https://github.com/libragen/libragen/commit/7060aad2856555c814102d6404753d717bc077da)]:
+  - @libragen/core@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
