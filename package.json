@@ -54,5 +54,8 @@
       "typescript": "^5.9.3",
       "typescript-json-schema": "0.67.0",
       "vitest": "^4.0.14"
+   },
+   "dependencies": {
+      "mkdirp": "^3.0.1"
    }
 }

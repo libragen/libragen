@@ -291,5 +291,5 @@ export function createCompletionsCommand(program: Command): Command {
          console.error(`Unknown action: ${action}`);
          console.error('Valid actions: install, uninstall, bash, zsh, fish');
          process.exit(1);
-      });
+      }) as unknown as Command;
 }
