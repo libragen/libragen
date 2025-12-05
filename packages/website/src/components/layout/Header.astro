@@ -1,6 +1,7 @@
 ---
 import ThemeToggle from './ThemeToggle';
 import { Github, Menu, X } from 'lucide-react';
+import { version } from '../../../../core/package.json';
 
 const navLinks = [
    { label: 'Docs', href: '/docs' },
@@ -20,6 +21,7 @@ const navLinks = [
             <rect x="14" y="13" width="14" height="3" rx="1" fill="#6366F1" opacity="0.5" />
          </svg>
          <span class="tracking-tight">libragen</span>
+         <span class="ml-1 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">v{version}</span>
       </a>
 
       <!-- Desktop Navigation -->
