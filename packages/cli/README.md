@@ -212,7 +212,7 @@ libragen q <query> [options]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `-l, --library <name-or-path>` | Library name or path to .libragen file (required) | — |
-| `-p, --path <paths...>` | Library path(s) for name resolution | auto-detect + global |
+| `-p, --path <paths...>` | Project directory (will search <path>/.libragen/libraries) | auto-detect + global |
 | `-k, --top-k <number>` | Number of results | `5` |
 | `-r, --rerank` | Enable cross-encoder reranking | `false` |
 | `-c, --context <lines>` | Lines of context around matches | `0` |
@@ -227,8 +227,8 @@ libragen query "authentication middleware" -l my-lib
 # Search by explicit file path
 libragen query "authentication middleware" -l ./my-lib.libragen
 
-# Search with custom library paths
-libragen query "error handling" -l my-lib -p .libragen/libraries -k 10
+# Search with custom project directory
+libragen query "error handling" -l my-lib -p ./my-project -k 10
 
 # JSON output for scripting
 libragen query "database connection" -l my-lib --json
@@ -330,7 +330,7 @@ libragen l [options]
 |--------|-------------|
 | `-v, --verbose` | Show detailed information (path, chunks, size, keywords, etc.) |
 | `--show-path` | Show the file path for each library |
-| `-p, --path <paths...>` | Library path(s) to use (excludes global and auto-detection) |
+| `-p, --path <paths...>` | Project directory (will search <path>/.libragen/libraries) |
 | `--json` | Output as JSON (includes path and location for each library) |
 | `--libraries` | Show only libraries |
 | `--collections` | Show only collections |
@@ -347,10 +347,10 @@ Each library shows:
 
 By default, libragen searches for libraries in:
 
-1. **Project directory** (if `.libragen/libraries/` exists in cwd) — auto-detected
-2. **Global directory** — platform-specific (see below)
+1. **Global directory** — `$LIBRAGEN_HOME/libraries` (platform-specific, see below)
+2. **Project directory** (if `.libragen/libraries/` exists in cwd) — auto-detected
 
-When `-p` is specified, **only** the provided path(s) are searched — no global or auto-detection.
+When `-p` is specified, the path is transformed to `<path>/.libragen/libraries` and **only** that path is searched — no global or auto-detection.
 
 ### `install`
 
@@ -368,7 +368,7 @@ libragen install <source> [options]
 
 | Option | Description |
 |--------|-------------|
-| `-p, --path <paths...>` | Library path(s) to use (excludes global and auto-detection) |
+| `-p, --path <paths...>` | Project directory (will install to <path>/.libragen/libraries) |
 | `-f, --force` | Overwrite existing library |
 | `-c, --collection <url>` | Collection URL to use |
 | `--content-version <version>` | Install specific content version |
@@ -377,14 +377,14 @@ libragen install <source> [options]
 **Examples:**
 
 ```bash
-# Install from file (to global or auto-detected project directory)
+# Install from file (defaults to $LIBRAGEN_HOME/libraries)
 libragen install ./my-lib.libragen
 
-# Install to specific directory
-libragen install ./my-lib.libragen -p .libragen/libraries
+# Install to a project directory (creates ./my-project/.libragen/libraries)
+libragen install ./my-lib.libragen -p ./my-project
 
-# Install to multiple paths (first path is used for install)
-libragen install ./my-lib.libragen -p ./libs -p ./vendor/libs
+# Install to multiple project directories (first path is used for install)
+libragen install ./my-lib.libragen -p ./project-a -p ./project-b
 
 # Install from collection (when configured)
 libragen install some-library
@@ -403,7 +403,7 @@ libragen u <name> [options]
 
 | Option | Description |
 |--------|-------------|
-| `-p, --path <paths...>` | Library path(s) to search (excludes global and auto-detection) |
+| `-p, --path <paths...>` | Project directory (will search <path>/.libragen/libraries) |
 | `-c, --collection` | Uninstall a collection (and unreferenced libraries) |
 
 ### `collection`
@@ -469,7 +469,7 @@ libragen up [name] [options]
 
 | Option | Description |
 |--------|-------------|
-| `-p, --path <paths...>` | Library path(s) to search (excludes global and auto-detection) |
+| `-p, --path <paths...>` | Project directory (will search <path>/.libragen/libraries) |
 | `-n, --dry-run` | Show what would be updated without making changes |
 | `-f, --force` | Force update even if versions match |
 
@@ -530,12 +530,11 @@ libragen completions fish > ~/.config/fish/completions/libragen.fish
 
 ## Library Locations
 
-Libraries are discovered from multiple locations:
+Libraries are discovered and installed to different locations:
 
-### Default Behavior (no `-p` flag)
+### Default Installation Location
 
-1. **Auto-detected project directory**: If `.libragen/libraries/` exists in the current working directory, it is included automatically.
-2. **Global directory**: Platform-specific location (see below).
+**By default, all installations go to the global directory** (`$LIBRAGEN_HOME/libraries`):
 
 | Platform | Global Location |
 |----------|-----------------|
@@ -543,21 +542,35 @@ Libraries are discovered from multiple locations:
 | Linux | `~/.local/share/libragen/libraries` |
 | Windows | `%APPDATA%\libragen\libraries` |
 
-### Explicit Paths (`-p` flag)
+You can override this with the `LIBRAGEN_HOME` environment variable.
 
-When `-p` is specified, **only** the provided path(s) are used — no global directory, no auto-detection. This is useful for:
+### Library Discovery (no `-p` flag)
+
+When searching for libraries (e.g., `libragen list`, `libragen query`), libragen looks in:
+
+1. **Global directory**: `$LIBRAGEN_HOME/libraries` (always included)
+2. **Auto-detected project directory**: If `.libragen/libraries/` exists in the current working directory, it is also searched
+
+### Project-Specific Libraries (`-p` flag)
+
+The `-p` flag automatically appends `.libragen/libraries` to the specified path:
+
+```bash
+# Install to ./my-project/.libragen/libraries
+libragen install my-lib.libragen -p ./my-project
+
+# List libraries in ./my-project/.libragen/libraries
+libragen list -p ./my-project
+
+# Use multiple project directories
+libragen list -p ./project-a -p ./project-b
+```
+
+When `-p` is specified, **only** the transformed path(s) are used — no global directory, no auto-detection. This is useful for:
 
 - Working with a specific project's libraries only
 - Testing with isolated library sets
 - CI/CD environments
-
-```bash
-# Use only project-local libraries
-libragen list -p .libragen/libraries
-
-# Use multiple paths
-libragen list -p ./libs -p ./vendor/libs
-```
 
 ## Exit Codes
 

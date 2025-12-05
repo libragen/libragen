@@ -114,7 +114,7 @@ libragen query [options] <query>
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `--library`, `-l` | string | Required | Library name or path to .libragen file |
-| `--path`, `-p` | string[] | auto-detect + global | Library path(s) for name resolution |
+| `--path`, `-p` | string[] | auto-detect + global | Project directory (will search <path>/.libragen/libraries) |
 | `--top-k`, `-k` | number | `10` | Number of results to return |
 | `--content-version` | string | — | Filter by content version |
 | `--format`, `-f` | string | `text` | Output format (`text`, `json`) |
@@ -137,8 +137,8 @@ libragen query --library my-docs "How do I authenticate?"
 # Query by explicit file path
 libragen query -l ./my-docs.libragen "How do I authenticate?"
 
-# Query with custom library paths
-libragen query -l my-docs -p .libragen/libraries "error handling"
+# Query with custom project directory
+libragen query -l my-docs -p ./my-project "error handling"
 
 # Get more results as JSON
 libragen query -l my-docs -k 20 -f json "error handling"
@@ -188,7 +188,7 @@ libragen list [options]
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `-p, --path` | string[] | — | Library path(s) to use (excludes global and auto-detection) |
+| `-p, --path` | string[] | — | Project directory (will search <path>/.libragen/libraries) |
 | `-v, --verbose` | boolean | `false` | Show detailed information (path, chunks, size, keywords) |
 | `--show-path` | boolean | `false` | Show the file path for each library |
 | `--json` | boolean | `false` | Output as JSON (includes path and location) |
@@ -208,10 +208,10 @@ The location badge helps identify which libraries come from project-local direct
 
 By default, libragen discovers libraries from:
 
-1. **Project directory** — If `.libragen/libraries/` exists in the current directory, it's included automatically
-2. **Global directory** — Platform-specific location (see [Library Storage](#library-storage))
+1. **Global directory** — `$LIBRAGEN_HOME/libraries` (platform-specific location, see below)
+2. **Project directory** — If `.libragen/libraries/` exists in the current directory, it's also searched
 
-When `-p` is specified, **only** the provided path(s) are searched—no global directory, no auto-detection.
+When `-p` is specified, the path is transformed to `<path>/.libragen/libraries` and **only** that path is searched—no global directory, no auto-detection.
 
 #### Examples
 
@@ -223,7 +223,7 @@ libragen list
 libragen list --show-path
 
 # List only project-local libraries
-libragen list -p .libragen/libraries
+libragen list -p ./my-project
 
 # List from multiple specific paths
 libragen list -p ./libs -p ./vendor/libs
@@ -361,7 +361,7 @@ libragen install <source> [options]
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `-p, --path` | string[] | — | Library path(s) to use (excludes global and auto-detection) |
+| `-p, --path` | string[] | — | Project directory (will install to <path>/.libragen/libraries) |
 | `-f, --force` | boolean | `false` | Overwrite existing library |
 | `-c, --collection` | string | — | Collection URL to use |
 | `--content-version` | string | — | Install specific content version |
@@ -370,14 +370,14 @@ libragen install <source> [options]
 #### Examples
 
 ```bash
-# Install from file (to global or auto-detected project directory)
+# Install from file (defaults to $LIBRAGEN_HOME/libraries)
 libragen install ./my-lib.libragen
 
-# Install to specific directory
-libragen install ./my-lib.libragen -p .libragen/libraries
+# Install to a project directory (creates ./my-project/.libragen/libraries)
+libragen install ./my-lib.libragen -p ./my-project
 
-# Install to multiple paths (first path is used for install)
-libragen install ./my-lib.libragen -p ./libs -p ./vendor/libs
+# Install to multiple project directories (first path is used for install)
+libragen install ./my-lib.libragen -p ./project-a -p ./project-b
 
 # Install from collection
 libragen install react-docs
@@ -400,7 +400,7 @@ libragen uninstall <name> [options]
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `-p, --path` | string[] | — | Library path(s) to search (excludes global and auto-detection) |
+| `-p, --path` | string[] | — | Project directory (will search <path>/.libragen/libraries) |
 | `-c, --collection` | boolean | `false` | Uninstall a collection (and unreferenced libraries) |
 
 #### Examples
@@ -409,8 +409,8 @@ libragen uninstall <name> [options]
 # Uninstall from auto-detected paths
 libragen uninstall my-docs
 
-# Uninstall from specific path only
-libragen uninstall my-docs -p .libragen/libraries
+# Uninstall from specific project only
+libragen uninstall my-docs -p ./my-project
 ```
 
 ---
@@ -433,7 +433,7 @@ libragen update [name] [options]
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `-p, --path` | string[] | — | Library path(s) to search (excludes global and auto-detection) |
+| `-p, --path` | string[] | — | Project directory (will search <path>/.libragen/libraries) |
 | `-n, --dry-run` | boolean | `false` | Show what would be updated without making changes |
 | `-f, --force` | boolean | `false` | Force update even if versions match |
 
@@ -450,7 +450,7 @@ libragen update react-docs
 libragen update --dry-run
 
 # Update only project-local libraries
-libragen update -p .libragen/libraries
+libragen update -p ./my-project
 ```
 
 ---

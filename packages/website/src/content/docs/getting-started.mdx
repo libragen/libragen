@@ -89,12 +89,11 @@ npm install --save-exact @libragen/core
 
 ## Library Storage
 
-Libraries are discovered from multiple locations:
+Libraries are stored and discovered from multiple locations:
 
-### Default Behavior
+### Default Installation Location
 
-1. **Project directory** — If `.libragen/libraries/` exists in the current directory, it's included automatically
-2. **Global directory** — Platform-specific location (see below)
+**By default, all installed .libragen files go to the global directory:**
 
 | Platform | Global Path |
 |----------|-------------|
@@ -102,15 +101,26 @@ Libraries are discovered from multiple locations:
 | Linux | `~/.local/share/libragen/libraries/` |
 | Windows | `%APPDATA%\libragen\libraries\` |
 
-Project-local libraries take priority over global libraries with the same name.
+You can override the global directory with the `LIBRAGEN_HOME` environment variable:
+
+```bash
+export LIBRAGEN_HOME=/custom/path
+```
+
+### Library Discovery
+
+When searching for libraries (e.g., `libragen list`, `libragen query`), libragen looks in:
+
+1. **Global directory** — `$LIBRAGEN_HOME/libraries` (always included)
+2. **Project directory** — If `.libragen/libraries/` exists in the current directory, it's also searched
 
 ### Project-Local Libraries
 
-To use project-specific libraries, create a `.libragen/libraries/` directory in your project:
+To install a library to a local directory instead of the global directory, use the `-p` flag (it automatically appends `.libragen/libraries`):
 
 ```bash
-mkdir -p .libragen/libraries
-libragen install ./my-lib.libragen -p .libragen/libraries
+# Install to ./my-project/.libragen/libraries
+libragen install ./my-lib.libragen -p ./my-project
 ```
 
 This is useful for:
