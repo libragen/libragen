@@ -6,10 +6,15 @@ order: 1
 ---
 
 import LibraryDownloadLink from '../../components/docs/LibraryDownloadLink.astro';
+export const libraryFilename = `libragen-docs-${import.meta.env.PUBLIC_LIBRAGEN_VERSION || '0.1.0'}.libragen`;
+export const libraryUrl = `${import.meta.env.SITE}/${libraryFilename}`;
 
 Libragen (pronounced "LIB-ruh-jen") lets you create portable, searchable RAG libraries from any documentation. Libraries are single SQLite files you can share, version control, and query locally—no cloud services required.
 
 > **Try it now:** This documentation is available as a libragen library. Download <LibraryDownloadLink /> and query it locally!
+>
+> <pre data-language="bash"><code>libragen install <a href={libraryUrl}>{libraryUrl}</a></code></pre>
+>
 
 ## Quick Start
 
@@ -21,11 +26,22 @@ Create a library from a directory of markdown, text, or HTML files:
 libragen build ./my-docs --name my-library
 ```
 
+Or, build from a git repository:
+
+```bash
+libragen build https://github.com/github/docs/tree/main/content
+```
+
 This will:
 - Process all supported files in `./my-docs`
 - Generate embeddings using a local model
 - Build a full-text search index
 - Save everything to `my-library-1.0.0.libragen`
+
+
+> NOTE: Depending on the size of your library, **building may take a few minutes**.
+>
+> Grab a coffee and come back in a few minutes; it's worth the wait!
 
 ### 2. Query Your Library
 
