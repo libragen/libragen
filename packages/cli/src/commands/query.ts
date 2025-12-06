@@ -85,11 +85,7 @@ async function resolveLibraryPath(
 /**
  * Print search results to the console.
  */
-function printResults(
-   results: Awaited<ReturnType<Searcher['search']>>,
-   contextBefore: number | undefined,
-   contextAfter: number | undefined
-): void {
+function printResults(results: Awaited<ReturnType<Searcher['search']>>): void {
    if (results.length === 0) {
       console.log(chalk.yellow('\nNo results found.'));
       return;
@@ -97,10 +93,8 @@ function printResults(
 
    console.log(chalk.bold(`\n📚 Found ${results.length} results:\n`));
 
-   const hasContext = Boolean(contextBefore || contextAfter);
-
    for (const [ index, result ] of results.entries()) {
-      printSingleResult(result, index, hasContext);
+      printSingleResult(result, index);
    }
 }
 
@@ -109,8 +103,7 @@ function printResults(
  */
 function printSingleResult(
    result: Awaited<ReturnType<Searcher['search']>>[number],
-   index: number,
-   hasContext: boolean | undefined
+   index: number
 ): void {
    const sourceInfo = result.sourceFile
       ? chalk.dim(path.basename(result.sourceFile))
@@ -128,7 +121,7 @@ function printSingleResult(
    console.log('');
 
    printContextBefore(result);
-   printMainContent(result, hasContext);
+   printMainContent(result);
    printContextAfter(result);
 
    console.log('');
@@ -150,20 +143,10 @@ function printContextBefore(result: Awaited<ReturnType<Searcher['search']>>[numb
    console.log('');
 }
 
-function printMainContent(
-   result: Awaited<ReturnType<Searcher['search']>>[number],
-   hasContext: boolean | undefined
-): void {
+function printMainContent(result: Awaited<ReturnType<Searcher['search']>>[number]): void {
    const content = result.content.trim();
 
-   if (hasContext) {
-      console.log(`   ${content.split('\n').join('\n   ')}`);
-   } else {
-      const maxLength = 200,
-            truncated = content.length > maxLength ? content.slice(0, maxLength) + '...' : content;
-
-      console.log(`   ${truncated.split('\n').join('\n   ')}`);
-   }
+   console.log(`   ${content.split('\n').join('\n   ')}`);
 }
 
 function printContextAfter(result: Awaited<ReturnType<Searcher['search']>>[number]): void {
@@ -223,7 +206,7 @@ export const queryCommand = new Command('query')
          store.initialize();
 
          const searcher = new Searcher(embedder, store),
-               k = parseInt(options.k || '5', 10),
+               k = parseInt(options.k || '10', 10),
                hybridAlpha = parseFloat(options.hybridAlpha || '0.5'),
                contextBefore = options.contextBefore ? parseInt(options.contextBefore, 10) : undefined,
                contextAfter = options.contextAfter ? parseInt(options.contextAfter, 10) : undefined;
@@ -248,7 +231,7 @@ export const queryCommand = new Command('query')
          if (options.json) {
             console.log(JSON.stringify(results, null, 2));
          } else {
-            printResults(results, contextBefore, contextAfter);
+            printResults(results);
          }
 
          store.close();

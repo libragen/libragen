@@ -379,9 +379,6 @@ libragen install ./my-lib.libragen -p ./my-project
 # Install to multiple project directories (first path is used for install)
 libragen install ./my-lib.libragen -p ./project-a -p ./project-b
 
-# Install from collection
-libragen install react-docs
-
 # Install from URL
 libragen install https://example.com/my-lib-1.0.0.libragen
 ```
