@@ -55,6 +55,10 @@ libragen install express.libragen
 libragen query "how to set up middleware" -l express
 ```
 
+These libraries are now accessible using the [Libragen MCP server.](https://www.libragen.dev/docs/mcp)
+
+Set it up and chat with your docs using your AI agent of choice.
+
 ### 3. Manage your libraries
 
 ```bash
