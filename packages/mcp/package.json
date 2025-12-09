@@ -1,6 +1,6 @@
 {
    "name": "@libragen/mcp",
-   "version": "0.3.0",
+   "version": "0.4.0",
    "description": "MCP server for querying libragen libraries from AI coding tools",
    "type": "module",
    "main": "./dist/index.js",
@@ -26,7 +26,7 @@
       "node": ">=24.0.0"
    },
    "dependencies": {
-      "@libragen/core": "^0.3.0",
+      "@libragen/core": "^0.4.0",
       "@modelcontextprotocol/sdk": "1.24.3",
       "better-sqlite3": "11.10.0",
       "zod": "3.25.76"
