@@ -40,12 +40,27 @@ function extractCommanderInfo(program: Command): {
       }
    }
 
-   // Extract subcommands
+   // Extract subcommands and their aliases
    for (const cmd of program.commands as Command[]) {
       const cmdName = cmd.name();
 
-      commands.push({ name: cmdName, description: cmd.description() || '' });
+      const description = cmd.description() || '';
+
+      commands.push({ name: cmdName, description });
+
+      // Add aliases as separate completions
+      const aliases = cmd.aliases();
+
+      for (const alias of aliases) {
+         commands.push({ name: alias, description: `${description} (alias for ${cmdName})` });
+      }
+
       commandOptions[cmdName] = [];
+
+      // Register options under both primary name and aliases
+      for (const alias of aliases) {
+         commandOptions[alias] = commandOptions[cmdName];
+      }
 
       // Extract command options
       for (const opt of cmd.options as Option[]) {
@@ -102,6 +117,84 @@ async function getInstalledLibraries(): Promise<string[]> {
    }
 }
 
+interface CommandCompletionContext {
+   currentCommand: string;
+   env: tabtab.ParseEnvResult;
+   shell: Shell;
+   cmdOpts: Array<{ name: string; description: string }>;
+   globalOptions: Array<{ name: string; description: string }>;
+   lastWord: string;
+}
+
+/**
+ * Handle completions for a specific command's arguments/options.
+ * Returns true if completion was handled, false otherwise.
+ */
+async function handleCommandCompletion(ctx: CommandCompletionContext): Promise<boolean> {
+   const { currentCommand, env, shell, cmdOpts, globalOptions, lastWord } = ctx;
+
+   // Check if previous word needs a value
+   if (env.prev === '-l' || env.prev === '--library') {
+      const libs = await getInstalledLibraries();
+
+      tabtab.log(libs, shell, console.log);
+      return true;
+   }
+
+   // Complete shell types for completions command
+   if (currentCommand === 'completions') {
+      tabtab.log([ 'bash', 'zsh', 'fish', 'install', 'uninstall' ], shell, console.log);
+      return true;
+   }
+
+   // Complete collection subcommands
+   if (currentCommand === 'collection') {
+      tabtab.log(
+         [
+            { name: 'list', description: 'List configured collections' },
+            { name: 'add', description: 'Add a collection' },
+            { name: 'remove', description: 'Remove a collection' },
+            { name: 'search', description: 'Search collections for libraries' },
+            { name: 'clear-cache', description: 'Clear collection cache' },
+            { name: 'create', description: 'Create a collection file (template if no libraries)' },
+            { name: 'pack', description: 'Pack a collection into a distributable archive' },
+            { name: 'unpack', description: 'Unpack a collection archive' },
+         ],
+         shell,
+         console.log
+      );
+      return true;
+   }
+
+   // Complete uninstall with library names (uninstall has alias 'u')
+   if (currentCommand === 'uninstall' || currentCommand === 'u') {
+      const libs = await getInstalledLibraries();
+
+      tabtab.log(libs, shell, console.log);
+      return true;
+   }
+
+   // If typing a flag (starts with -), show options
+   if (lastWord.startsWith('-') || env.line.endsWith(' ')) {
+      const completions = [
+         ...cmdOpts.map((opt) => { return { name: opt.name, description: opt.description }; }),
+         ...globalOptions.map((opt) => { return { name: opt.name, description: opt.description }; }),
+      ];
+
+      tabtab.log(completions, shell, console.log);
+      return true;
+   }
+
+   // For commands expecting files as first arg, use filesystem completion
+   // (build has alias 'b')
+   if (currentCommand === 'build' || currentCommand === 'b' || currentCommand === 'install' || currentCommand === 'inspect') {
+      tabtab.logFiles();
+      return true;
+   }
+
+   return false;
+}
+
 /**
  * Handle completion requests from the shell.
  */
@@ -138,62 +231,16 @@ async function handleCompletion(program: Command): Promise<void> {
    if (currentCommand && currentCommand !== 'completion-server') {
       const cmdOpts = commandOptions[currentCommand] || [];
 
-      // Check if previous word needs a value
-      if (env.prev === '-l' || env.prev === '--library') {
-         // Complete with installed library names
-         const libs = await getInstalledLibraries();
+      const handled = await handleCommandCompletion({
+         currentCommand,
+         env,
+         shell,
+         cmdOpts,
+         globalOptions,
+         lastWord,
+      });
 
-         tabtab.log(libs, shell, console.log);
-         return;
-      }
-
-      // Complete shell types for completions command
-      if (currentCommand === 'completions') {
-         tabtab.log([ 'bash', 'zsh', 'fish', 'install', 'uninstall' ], shell, console.log);
-         return;
-      }
-
-      // Complete collection subcommands
-      if (currentCommand === 'collection') {
-         tabtab.log(
-            [
-               { name: 'list', description: 'List configured collections' },
-               { name: 'add', description: 'Add a collection' },
-               { name: 'remove', description: 'Remove a collection' },
-               { name: 'search', description: 'Search collections for libraries' },
-               { name: 'clear-cache', description: 'Clear collection cache' },
-               { name: 'create', description: 'Create a collection file (template if no libraries)' },
-               { name: 'pack', description: 'Pack a collection into a distributable archive' },
-               { name: 'unpack', description: 'Unpack a collection archive' },
-            ],
-            shell,
-            console.log
-         );
-         return;
-      }
-
-      // Complete uninstall with library names
-      if (currentCommand === 'uninstall') {
-         const libs = await getInstalledLibraries();
-
-         tabtab.log(libs, shell, console.log);
-         return;
-      }
-
-      // If typing a flag (starts with -), show options
-      if (lastWord.startsWith('-') || env.line.endsWith(' ')) {
-         const completions = [
-            ...cmdOpts.map((opt) => { return { name: opt.name, description: opt.description }; }),
-            ...globalOptions.map((opt) => { return { name: opt.name, description: opt.description }; }),
-         ];
-
-         tabtab.log(completions, shell, console.log);
-         return;
-      }
-
-      // For commands expecting files as first arg, use filesystem completion
-      if (currentCommand === 'build' || currentCommand === 'install' || currentCommand === 'inspect') {
-         tabtab.logFiles();
+      if (handled) {
          return;
       }
 
