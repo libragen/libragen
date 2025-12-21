@@ -141,6 +141,43 @@ npm run build
 npx tsc --build
 ```
 
+## Releasing
+
+This repo uses **changesets** with automated GitHub Actions for releases.
+
+**DO NOT run `npm run version` or `npm run release` locally.** The release process is:
+
+1. **Create a changeset** describing your changes:
+   ```bash
+   npm run changeset
+   ```
+   Or create a file manually in `.changeset/` with the format:
+   ```markdown
+   ---
+   "@libragen/cli": minor
+   ---
+
+   Description of changes
+   ```
+
+2. **Commit and push** the changeset file along with your code changes
+
+3. **GitHub Actions handles the rest:**
+   - When changesets are pushed to `main`, the `changesets/action` creates a "Version Packages" PR
+   - This PR contains the version bumps and CHANGELOG updates
+   - **Merging that PR triggers the actual npm publish**
+
+**Changeset types:**
+- `major` - Breaking changes
+- `minor` - New features
+- `patch` - Bug fixes
+
+**Linked packages:** `@libragen/core`, `@libragen/cli`, and `@libragen/mcp` are linked in
+`.changeset/config.json`, meaning they share version numbers.
+
+**Ignored packages:** `@libragen/website`, `@libragen/collections-site`, and `@libragen/ui` are
+not published to npm.
+
 ## Core Design Principles
 
 ### Core as the Single Source of Truth
@@ -312,3 +349,4 @@ DO NOT USE SCOPED COMMITS
 8. **Linting errors** - Run `npm run standards` as a final check before finishing a task
 9. **Duplicating logic between CLI and MCP** - If logic could be shared, it belongs in core. See "Core Design Principles" above
 10. **Implementing business logic in CLI/MCP** - CLI and MCP should be thin wrappers around core functionality
+11. **Running `npm run version` or `npm run release` locally** - Use changesets workflow instead. See "Releasing" above
