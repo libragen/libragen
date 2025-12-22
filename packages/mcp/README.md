@@ -33,8 +33,9 @@ Try it in 60 seconds with the libragen documentation library:
 curl -L -O https://libragen.dev/libragen-docs-0.4.0.libragen
 npx @libragen/cli install libragen-docs-0.4.0.libragen
 
-# Install the MCP server
-npx -y install-mcp @libragen/mcp
+# Install the MCP server (recommended: global install for reliability)
+npm install -g @libragen/mcp
+npx -y install-mcp libragen-mcp
 ```
 
 Restart your AI tool (Claude Desktop, VS Code, Cursor, etc.), then ask:
@@ -64,7 +65,19 @@ Libraries are automatically discovered from your global directory and any `.libr
 <details>
 <summary><strong>Manual MCP configuration</strong></summary>
 
-Add to your tool's MCP config:
+Add to your tool's MCP config (using global install):
+
+```json
+{
+  "mcpServers": {
+    "libragen": {
+      "command": "libragen-mcp"
+    }
+  }
+}
+```
+
+Or with npx (may have cache issues on some systems):
 
 ```json
 {

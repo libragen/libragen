@@ -115,6 +115,35 @@ source ~/.bashrc
 3. Check `npx` is in your PATH
 4. Restart your AI tool completely (not just the chat)
 
+### npx cache corruption (ENOTEMPTY error)
+
+**Cause:** The npx cache can become corrupted, especially with native modules like `better-sqlite3`. You may see errors like:
+```
+ENOTEMPTY: directory not empty, rename '.../node_modules/better-sqlite3'
+```
+
+**Solutions:**
+1. Clear the corrupted npx cache:
+```bash
+rm -rf ~/.npm/_npx
+```
+2. Restart your AI tool
+
+**Prevention:** For more reliable operation, install globally instead of using npx:
+```bash
+npm install -g @libragen/mcp
+```
+Then update your MCP config to use the global install:
+```json
+{
+  "mcpServers": {
+    "libragen": {
+      "command": "libragen-mcp"
+    }
+  }
+}
+```
+
 ### "No libraries found" in MCP
 
 **Cause:** Libraries not in the default directory.
